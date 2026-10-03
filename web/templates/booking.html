@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reservasi — The Grand Azura Hotel</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/booking.css') }}" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar navbar-solid" id="navbar">
+    <div class="nav-container">
+      <a href="/" class="nav-logo">
+        <span class="logo-symbol">✦</span>
+        <span class="logo-text">The Grand Azura</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="/#rooms">Kamar</a></li>
+        <li><a href="/#amenities">Fasilitas</a></li>
+        <li><a href="/#about">Tentang</a></li>
+        <li><a href="/my-booking">Cek Reservasi</a></li>
+        <li><a href="/staff/login" class="nav-staff">Staff Login</a></li>
+        <li><a href="/booking" class="nav-cta active">Pesan Sekarang</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div class="page-header-overlay"></div>
+    <div class="page-header-content">
+      <p class="section-eyebrow">The Grand Azura Hotel</p>
+      <h1>Formulir Reservasi</h1>
+      <p>Pilih kamar dan lengkapi informasi untuk mengamankan penginapan Anda</p>
+    </div>
+  </div>
+
+  <!-- FORM SECTION -->
+  <section class="booking-section">
+    <div class="booking-container" style="max-width:960px">
+
+      <!-- STEPS INDICATOR -->
+      <div class="steps-bar">
+        <div class="step active" id="step-ind-0">
+          <div class="step-circle">1</div>
+          <span>Pilih Kamar</span>
+        </div>
+        <div class="step-line"></div>
+        <div class="step" id="step-ind-1">
+          <div class="step-circle">2</div>
+          <span>Info Tamu</span>
+        </div>
+        <div class="step-line"></div>
+        <div class="step" id="step-ind-2">
+          <div class="step-circle">3</div>
+          <span>Detail Menginap</span>
+        </div>
+        <div class="step-line"></div>
+        <div class="step" id="step-ind-3">
+          <div class="step-circle">4</div>
+          <span>Konfirmasi</span>
+        </div>
+      </div>
+
+      <form id="booking-form" novalidate>
+
+        <!-- ── STEP 0: PILIH KAMAR ── -->
+        <div class="form-step active" id="step-0">
+          <div class="form-card">
+            <h2 class="form-card-title">Pilih Tipe Kamar</h2>
+            <p style="color:var(--mid);font-size:.88rem;margin-bottom:1.8rem">Klik kamar yang Anda inginkan. Harga belum termasuk surcharge paket makan.</p>
+
+            <div class="room-picker-grid" id="room-picker-grid">
+              <!-- diisi JS -->
+            </div>
+
+            <p class="room-pick-error hidden" id="room-pick-error">Silakan pilih tipe kamar terlebih dahulu.</p>
+
+            <div class="form-nav">
+              <a href="/#rooms" class="btn-back">← Lihat Kamar</a>
+              <button type="button" class="btn-next" id="next-0">Selanjutnya →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── STEP 1: INFO TAMU ── -->
+        <div class="form-step" id="step-1">
+          <div class="form-card">
+            <h2 class="form-card-title">Informasi Tamu</h2>
+
+            <!-- Kamar terpilih — ringkasan -->
+            <div class="selected-room-banner" id="selected-room-banner"></div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="guest_name">Nama Lengkap <span class="req">*</span></label>
+                <input type="text" id="guest_name" name="guest_name" placeholder="Masukkan nama lengkap" required />
+              </div>
+              <div class="form-group">
+                <label for="guest_email">Email <span class="req">*</span></label>
+                <input type="email" id="guest_email" name="guest_email"
+                       placeholder="email@contoh.com" required
+                       autocomplete="email" />
+                <small class="field-hint">Digunakan untuk cek & batalkan reservasi</small>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="country">Negara Asal <span class="req">*</span></label>
+                <select id="country" name="country" required>
+                  {% for code, name in country_choices %}
+                  <option value="{{ code }}">{{ name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="hotel">Tipe Hotel <span class="req">*</span></label>
+                <div class="radio-group">
+                  <label class="radio-card">
+                    <input type="radio" name="hotel" value="City Hotel" checked />
+                    <div class="radio-content">
+                      <span class="radio-icon">🏙</span>
+                      <strong>City Hotel</strong>
+                      <small>Pusat kota, dekat bisnis</small>
+                    </div>
+                  </label>
+                  <label class="radio-card">
+                    <input type="radio" name="hotel" value="Resort Hotel" />
+                    <div class="radio-content">
+                      <span class="radio-icon">🏖</span>
+                      <strong>Resort Hotel</strong>
+                      <small>Tepi pantai, pemandangan laut</small>
+                    </div>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-row three-col">
+              <div class="form-group">
+                <label for="adults">Jumlah Dewasa <span class="req">*</span></label>
+                <div class="number-input">
+                  <button type="button" class="num-btn minus" data-target="adults">−</button>
+                  <input type="number" id="adults" name="adults" value="2" min="1" max="10" />
+                  <button type="button" class="num-btn plus" data-target="adults">+</button>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="children">Jumlah Anak</label>
+                <div class="number-input">
+                  <button type="button" class="num-btn minus" data-target="children">−</button>
+                  <input type="number" id="children" name="children" value="0" min="0" max="10" />
+                  <button type="button" class="num-btn plus" data-target="children">+</button>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="babies">Bayi</label>
+                <div class="number-input">
+                  <button type="button" class="num-btn minus" data-target="babies">−</button>
+                  <input type="number" id="babies" name="babies" value="0" min="0" max="5" />
+                  <button type="button" class="num-btn plus" data-target="babies">+</button>
+                </div>
+              </div>
+            </div>
+            <!-- Peringatan kapasitas -->
+            <p class="capacity-warn hidden" id="capacity-warn"></p>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="customer_type">Tipe Pelanggan</label>
+                <select id="customer_type" name="customer_type">
+                  {% for ct in customer_types %}
+                  <option value="{{ ct }}">{{ ct }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="market_segment">Saluran Pemesanan</label>
+                <select id="market_segment" name="market_segment">
+                  {% for ms in market_segments %}
+                  <option value="{{ ms }}">{{ ms }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+
+            <div class="form-nav">
+              <button type="button" class="btn-back" id="back-1">← Kembali</button>
+              <button type="button" class="btn-next" id="next-1">Selanjutnya →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── STEP 2: DETAIL MENGINAP ── -->
+        <div class="form-step" id="step-2">
+          <div class="form-card">
+            <h2 class="form-card-title">Detail Menginap</h2>
+
+            <!-- Kamar terpilih — ringkasan -->
+            <div class="selected-room-banner" id="selected-room-banner-2"></div>
+
+            <div class="form-row three-col">
+              <div class="form-group">
+                <label for="arrival_date_month">Bulan Kedatangan <span class="req">*</span></label>
+                <select id="arrival_date_month" name="arrival_date_month" required>
+                  {% for m in months %}
+                  <option value="{{ m }}">{{ m }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="arrival_date_day_of_month">Tanggal <span class="req">*</span></label>
+                <input type="number" id="arrival_date_day_of_month" name="arrival_date_day_of_month" min="1" max="31" required />
+              </div>
+              <div class="form-group">
+                <label for="arrival_date_year">Tahun <span class="req">*</span></label>
+                <input type="number" id="arrival_date_year" name="arrival_date_year" min="2024" max="2030" required />
+              </div>
+            </div>
+
+            <!-- Field jam — hanya muncul jika kedatangan hari ini -->
+            <div class="form-row hidden" id="checkin-time-row">
+              <div class="form-group" style="grid-column:1/-1">
+                <label for="checkin_hour">Jam Check-In Hari Ini <span class="req">*</span></label>
+                <input type="time" id="checkin_hour" name="checkin_hour"
+                       style="border:1.5px solid var(--border);border-radius:var(--radius);padding:.75rem 1rem;font-size:.95rem;outline:none;width:100%;font-family:inherit;" />
+                <small class="field-hint">Karena kedatangan hari ini, masukkan perkiraan jam check-in (minimal 1 jam dari sekarang)</small>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="stays_in_week_nights">Malam Hari Kerja <span class="req">*</span></label>
+                <div class="number-input">
+                  <button type="button" class="num-btn minus" data-target="stays_in_week_nights">−</button>
+                  <input type="number" id="stays_in_week_nights" name="stays_in_week_nights" value="2" min="0" max="50" required />
+                  <button type="button" class="num-btn plus" data-target="stays_in_week_nights">+</button>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="stays_in_weekend_nights">Malam Akhir Pekan</label>
+                <div class="number-input">
+                  <button type="button" class="num-btn minus" data-target="stays_in_weekend_nights">−</button>
+                  <input type="number" id="stays_in_weekend_nights" name="stays_in_weekend_nights" value="1" min="0" max="20" />
+                  <button type="button" class="num-btn plus" data-target="stays_in_weekend_nights">+</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="meal">Paket Makan</label>
+                <select id="meal" name="meal">
+                  {% for code, label in meal_choices %}
+                  <option value="{{ code }}">{{ label }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="deposit_type">Tipe Deposit</label>
+                <select id="deposit_type" name="deposit_type">
+                  {% for d in deposit_types %}
+                  <option value="{{ d }}">{{ d }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+
+            <!-- Harga otomatis -->
+            <div class="form-row">
+              <div class="form-group" style="grid-column:1/-1">
+                <label>Harga per Malam</label>
+                <div class="adr-display" id="adr-display">
+                  <span class="adr-amount" id="adr-amount">Rp —</span>
+                  <span class="adr-note" id="adr-note">Pilih kamar dan paket makan</span>
+                </div>
+                <input type="hidden" id="adr" name="adr" value="0" />
+              </div>
+            </div>
+
+            <div class="form-row three-col">
+              <div class="form-group">
+                <label for="lead_time">Lead Time</label>
+                <div class="adr-display" id="lead-time-display">
+                  <span class="adr-amount" id="lead-time-amount">— hari</span>
+                  <span class="adr-note" id="lead-time-note">Dihitung otomatis dari tanggal kedatangan</span>
+                </div>
+                <input type="hidden" id="lead_time" name="lead_time" value="0" />
+              </div>
+              <div class="form-group">
+                <label for="required_car_parking_spaces">Parkir Mobil</label>
+                <div class="number-input">
+                  <button type="button" class="num-btn minus" data-target="required_car_parking_spaces">−</button>
+                  <input type="number" id="required_car_parking_spaces" name="required_car_parking_spaces" value="0" min="0" max="8" />
+                  <button type="button" class="num-btn plus" data-target="required_car_parking_spaces">+</button>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="total_of_special_requests">Permintaan Khusus</label>
+                <div class="number-input">
+                  <button type="button" class="num-btn minus" data-target="total_of_special_requests">−</button>
+                  <input type="number" id="total_of_special_requests" name="total_of_special_requests" value="0" min="0" max="5" />
+                  <button type="button" class="num-btn plus" data-target="total_of_special_requests">+</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- hidden field tipe kamar — diisi dari step 0 -->
+            <input type="hidden" id="reserved_room_type" name="reserved_room_type" value="A" />
+
+            <div class="form-nav">
+              <button type="button" class="btn-back" id="back-2">← Kembali</button>
+              <button type="button" class="btn-next" id="next-2">Selanjutnya →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── STEP 3: KONFIRMASI ── -->
+        <div class="form-step" id="step-3">
+          <div class="form-card">
+            <h2 class="form-card-title">Konfirmasi Reservasi</h2>
+            <div class="summary-grid" id="summary-grid"></div>
+            <div class="total-bar">
+              <span>Estimasi Total</span>
+              <span id="total-price">Rp 0</span>
+            </div>
+            <div class="form-nav">
+              <button type="button" class="btn-back" id="back-3">← Kembali</button>
+              <button type="submit" class="btn-submit" id="submit-btn">
+                <span id="submit-text">Konfirmasi Reservasi</span>
+                <span id="submit-spinner" class="spinner hidden"></span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </form>
+
+      <!-- RESULT OVERLAY -->
+      <div class="result-overlay hidden" id="result-overlay">
+        <div class="result-card">
+          <div class="result-icon" id="result-icon"></div>
+          <h2 id="result-title">Reservasi Berhasil!</h2>
+          <p id="result-desc"></p>
+          <div class="result-booking-id" id="result-booking-id"></div>
+          <div class="result-policy-box" id="result-policy-box"></div>
+          <div class="result-actions">
+            <a href="/" class="btn-ghost">Kembali ke Beranda</a>
+            <button onclick="location.reload()" class="btn-primary">Buat Reservasi Baru</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <footer class="footer footer-minimal">
+    <div class="footer-bottom">
+      <p>© 2024 The Grand Azura Hotel. Seluruh hak cipta dilindungi.</p>
+    </div>
+  </footer>
+
+  <script src="{{ url_for('static', filename='js/booking.js') }}"></script>
+</body>
+</html>

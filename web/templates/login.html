@@ -1,0 +1,70 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Staff Login — The Grand Azura Hotel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}" />
+</head>
+<body>
+
+  <!-- LEFT VISUAL PANEL -->
+  <div class="login-visual">
+    <div class="login-visual-brand">
+      <span class="logo-symbol">✦</span>
+      <span class="logo-text">The Grand Azura Hotel</span>
+    </div>
+    <h2>Sistem Manajemen<br/>Risiko Pembatalan</h2>
+    <p>Dashboard eksklusif untuk staf hotel dalam memantau dan mengelola risiko pembatalan tamu secara real-time dengan bantuan AI.</p>
+  </div>
+
+  <!-- RIGHT LOGIN PANEL -->
+  <div class="login-panel">
+    <div class="login-panel-header">
+      <p class="login-eyebrow">Staff Access Only</p>
+      <h1>Masuk ke Dashboard</h1>
+      <p>Masukkan password staff untuk melanjutkan</p>
+    </div>
+
+    <form class="login-form" method="POST" action="/staff/login">
+
+      {% if error %}
+      <div class="login-error">
+        <span>⚠️</span> {{ error }}
+      </div>
+      {% endif %}
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <div class="input-wrap">
+          <input type="password" id="password" name="password"
+                 placeholder="Masukkan password staff"
+                 autocomplete="current-password"
+                 required autofocus />
+          <button type="button" class="toggle-pw" id="toggle-pw" title="Tampilkan/sembunyikan password">
+            👁
+          </button>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-login">Masuk →</button>
+    </form>
+
+    <p class="login-back">
+      <a href="/">← Kembali ke website hotel</a>
+    </p>
+  </div>
+
+  <script>
+    // Toggle show/hide password
+    document.getElementById('toggle-pw').addEventListener('click', function () {
+      const input = document.getElementById('password');
+      const isText = input.type === 'text';
+      input.type = isText ? 'password' : 'text';
+      this.textContent = isText ? '👁' : '🙈';
+    });
+  </script>
+</body>
+</html>

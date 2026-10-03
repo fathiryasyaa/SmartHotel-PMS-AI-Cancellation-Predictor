@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Staff Dashboard — The Grand Azura Hotel</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet" />
+</head>
+<body class="dashboard-body">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <span class="logo-symbol">✦</span>
+      <span class="logo-text">Grand Azura</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="#" class="sidebar-link active" data-section="overview">
+        <span class="sidebar-icon">📊</span> Overview
+      </a>
+      <a href="#" class="sidebar-link" data-section="bookings">
+        <span class="sidebar-icon">📋</span> Semua Reservasi
+      </a>
+      <a href="#" class="sidebar-link" data-section="high-risk">
+        <span class="sidebar-icon">⚠️</span> Risiko Tinggi
+      </a>
+      <a href="#" class="sidebar-link" data-section="analytics">
+        <span class="sidebar-icon">📈</span> Analitik
+      </a>
+      <a href="#" class="sidebar-link" data-section="deleted">
+        <span class="sidebar-icon">🗑️</span> Log Terhapus
+      </a>
+      <a href="/pms" class="sidebar-link">
+        <span class="sidebar-icon">🏨</span> PMS
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="/" class="sidebar-link">
+        <span class="sidebar-icon">🏠</span> Kembali ke Website
+      </a>
+      <a href="/staff/logout" class="sidebar-link" style="color:rgba(255,100,100,0.7)">
+        <span class="sidebar-icon">🚪</span> Logout
+      </a>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="dash-main">
+
+    <!-- TOPBAR -->
+    <header class="dash-topbar">
+      <div class="topbar-left">
+        <button class="sidebar-toggle" id="sidebar-toggle">☰</button>
+        <div>
+          <h1 class="topbar-title">Staff Dashboard</h1>
+          <p class="topbar-sub">The Grand Azura Hotel — Sistem Manajemen Risiko Pembatalan</p>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-badge" id="live-badge">
+          <span class="live-dot"></span> Live
+        </div>
+        <div class="topbar-date" id="topbar-date"></div>
+      </div>
+    </header>
+
+    <!-- ── SECTION: OVERVIEW ── -->
+    <section class="dash-section active" id="section-overview">
+
+      <!-- KPI CARDS -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-icon kpi-total">📋</div>
+          <div class="kpi-info">
+            <span class="kpi-label">Total Reservasi</span>
+            <span class="kpi-value" id="kpi-total">0</span>
+          </div>
+        </div>
+        <div class="kpi-card kpi-danger">
+          <div class="kpi-icon">🔴</div>
+          <div class="kpi-info">
+            <span class="kpi-label">Risiko Tinggi</span>
+            <span class="kpi-value" id="kpi-high">0</span>
+          </div>
+        </div>
+        <div class="kpi-card kpi-warning">
+          <div class="kpi-icon">🟡</div>
+          <div class="kpi-info">
+            <span class="kpi-label">Risiko Sedang</span>
+            <span class="kpi-value" id="kpi-medium">0</span>
+          </div>
+        </div>
+        <div class="kpi-card kpi-success">
+          <div class="kpi-icon">🟢</div>
+          <div class="kpi-info">
+            <span class="kpi-label">Risiko Rendah</span>
+            <span class="kpi-value" id="kpi-low">0</span>
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon">📉</div>
+          <div class="kpi-info">
+            <span class="kpi-label">Rata-rata Risiko</span>
+            <span class="kpi-value" id="kpi-avg">0%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHART AREA -->
+      <div class="chart-row">
+        <div class="chart-card chart-wide">
+          <div class="chart-header">
+            <h3>Distribusi Risiko Pembatalan</h3>
+            <span class="chart-refresh" id="refresh-btn" title="Refresh">↻</span>
+          </div>
+          <canvas id="riskBarChart" height="120"></canvas>
+        </div>
+        <div class="chart-card chart-narrow">
+          <div class="chart-header"><h3>Komposisi Risiko</h3></div>
+          <canvas id="riskDonutChart" height="180"></canvas>
+          <div class="donut-legend" id="donut-legend"></div>
+        </div>
+      </div>
+
+      <!-- RECENT BOOKINGS MINI TABLE -->
+      <div class="table-card">
+        <div class="table-header">
+          <h3>Reservasi Terbaru</h3>
+          <a href="#" class="view-all" data-section="bookings">Lihat Semua →</a>
+        </div>
+        <div class="table-scroll">
+          <table class="data-table" id="recent-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Tamu</th>
+                <th>Hotel</th>
+                <th>Tiba</th>
+                <th>Durasi</th>
+                <th>Probabilitas</th>
+                <th>Status Risiko</th>
+                <th>Kebijakan</th>
+              </tr>
+            </thead>
+            <tbody id="recent-tbody">
+              <tr class="empty-row"><td colspan="8">Belum ada data reservasi</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── SECTION: ALL BOOKINGS ── -->
+    <section class="dash-section" id="section-bookings">
+      <div class="section-toolbar">
+        <h2>Semua Reservasi</h2>
+        <div class="toolbar-controls">
+          <input type="text" id="search-input" placeholder="Cari nama atau ID..." class="search-input" />
+          <select id="filter-risk" class="filter-select">
+            <option value="">Semua Risiko</option>
+            <option value="high">Risiko Tinggi</option>
+            <option value="medium">Risiko Sedang</option>
+            <option value="low">Risiko Rendah</option>
+          </select>
+        </div>
+      </div>
+      <div class="table-card">
+        <div class="table-scroll">
+          <table class="data-table" id="all-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Tamu</th>
+                <th>Hotel</th>
+                <th>Tiba</th>
+                <th>Durasi</th>
+                <th>Kamar</th>
+                <th>Deposit</th>
+                <th>Lead Time</th>
+                <th>Probabilitas</th>
+                <th>Risiko</th>
+                <th>Status PMS</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="all-tbody">
+              <tr class="empty-row"><td colspan="12">Belum ada data reservasi</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── SECTION: HIGH RISK ── -->
+    <section class="dash-section" id="section-high-risk">
+      <div class="section-toolbar">
+        <h2>⚠️ Reservasi Risiko Tinggi</h2>
+        <span class="count-badge" id="high-risk-count">0 reservasi</span>
+      </div>
+      <div class="alert-banner">
+        <span class="alert-icon">🔔</span>
+        <p>Tamu berikut memiliki probabilitas pembatalan di atas 70%. Segera tindak lanjuti dengan kebijakan deposit penuh atau konfirmasi ulang.</p>
+      </div>
+      <div class="risk-cards-grid" id="high-risk-cards">
+        <div class="risk-card-empty">Tidak ada reservasi risiko tinggi saat ini</div>
+      </div>
+    </section>
+
+    <!-- ── SECTION: LOG TERHAPUS ── -->
+    <section class="dash-section" id="section-deleted">
+      <div class="section-toolbar">
+        <h2>🗑️ Log Reservasi Terhapus</h2>
+      </div>
+      <div class="alert-banner" style="border-color:#b0d8b8;background:var(--success-bg)">
+        <span class="alert-icon">🔒</span>
+        <p style="color:#1a5c2a">Data di bawah adalah reservasi yang telah dihapus. Data tidak benar-benar hilang — tersimpan untuk keperluan audit dan tidak digunakan dalam perhitungan statistik dashboard.</p>
+      </div>
+      <div class="table-card">
+        <div class="table-scroll">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Tamu</th>
+                <th>Hotel</th>
+                <th>Kedatangan</th>
+                <th>Probabilitas</th>
+                <th>Risiko</th>
+                <th>Info Penghapusan</th>
+              </tr>
+            </thead>
+            <tbody id="deleted-tbody">
+              <tr class="empty-row"><td colspan="7">Belum ada data yang dihapus</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── SECTION: ANALYTICS ── -->
+    <section class="dash-section" id="section-analytics">
+      <h2>Analitik Model AI</h2>
+      <div class="analytics-grid">
+        <div class="analytics-card">
+          <h3>Tentang Model</h3>
+          <div class="model-info-grid">
+            <div class="model-info-item">
+              <span class="model-info-label">Algoritma</span>
+              <span class="model-info-value">XGBoost (Tuned)</span>
+            </div>
+            <div class="model-info-item">
+              <span class="model-info-label">F1-Score</span>
+              <span class="model-info-value highlight">84.97%</span>
+            </div>
+            <div class="model-info-item">
+              <span class="model-info-label">Cross-Validation F1</span>
+              <span class="model-info-value highlight">84.62%</span>
+            </div>
+            <div class="model-info-item">
+              <span class="model-info-label">Data Training</span>
+              <span class="model-info-value">95.512 records</span>
+            </div>
+            <div class="model-info-item">
+              <span class="model-info-label">Dataset</span>
+              <span class="model-info-value">Hotel Booking (2015–2017)</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="analytics-card">
+          <h3>Fitur Paling Berpengaruh (XGBoost)</h3>
+          <div class="feature-bar-list">
+            <div class="feature-bar-item">
+              <span class="feat-name">deposit_type_Non Refund</span>
+              <div class="feat-bar-wrap">
+                <div class="feat-bar" style="width:50.63%"></div>
+                <span>50.63%</span>
+              </div>
+            </div>
+            <div class="feature-bar-item">
+              <span class="feat-name">market_segment_Online TA</span>
+              <div class="feat-bar-wrap">
+                <div class="feat-bar" style="width:9.17%"></div>
+                <span>9.17%</span>
+              </div>
+            </div>
+            <div class="feature-bar-item">
+              <span class="feat-name">required_car_parking_spaces</span>
+              <div class="feat-bar-wrap">
+                <div class="feat-bar" style="width:7.03%"></div>
+                <span>7.03%</span>
+              </div>
+            </div>
+            <div class="feature-bar-item">
+              <span class="feat-name">lead_time</span>
+              <div class="feat-bar-wrap">
+                <div class="feat-bar" style="width:5.5%"></div>
+                <span>5.5%</span>
+              </div>
+            </div>
+            <div class="feature-bar-item">
+              <span class="feat-name">country_freq</span>
+              <div class="feat-bar-wrap">
+                <div class="feat-bar" style="width:4.2%"></div>
+                <span>4.2%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="analytics-card analytics-wide">
+          <h3>Panduan Kebijakan Risiko</h3>
+          <div class="policy-guide-grid">
+            <div class="policy-item policy-high">
+              <div class="policy-badge">🔴 &gt;70%</div>
+              <strong>Risiko Tinggi</strong>
+              <p>Wajib deposit penuh atau status Non-Refundable. Lakukan konfirmasi ulang H-7 sebelum kedatangan.</p>
+            </div>
+            <div class="policy-item policy-medium">
+              <div class="policy-badge">🟡 30–70%</div>
+              <strong>Risiko Sedang</strong>
+              <p>Kenakan biaya pembatalan 50% jika dilakukan kurang dari 7 hari sebelum kedatangan.</p>
+            </div>
+            <div class="policy-item policy-low">
+              <div class="policy-badge">🟢 &lt;30%</div>
+              <strong>Risiko Rendah</strong>
+              <p>Berikan fleksibilitas pembatalan gratis untuk meningkatkan kepuasan dan loyalitas tamu.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ── DELETE CONFIRMATION MODAL ── -->
+  <div class="modal-overlay hidden" id="delete-modal">
+    <div class="modal-card">
+      <div class="modal-icon">🗑️</div>
+      <h3>Hapus Reservasi</h3>
+      <p>Reservasi <strong id="delete-modal-id"></strong> milik <strong id="delete-modal-name"></strong> akan dihapus dari daftar aktif.</p>
+      <p class="modal-note">Data tidak hilang permanen — tersimpan di Log Terhapus untuk keperluan audit.</p>
+      <div class="modal-field">
+        <label for="delete-by">Nama Staff</label>
+        <input type="text" id="delete-by" placeholder="Nama Anda..." />
+      </div>
+      <div class="modal-field">
+        <label for="delete-reason">Alasan Penghapusan <span style="color:var(--danger)">*</span></label>
+        <textarea id="delete-reason" rows="3" placeholder="Contoh: Input salah dari tamu, duplikasi reservasi, dll."></textarea>
+      </div>
+      <p class="modal-error hidden" id="delete-error">Alasan penghapusan wajib diisi.</p>
+      <div class="modal-actions">
+        <button class="btn-modal-cancel" id="delete-cancel">Batal</button>
+        <button class="btn-modal-confirm" id="delete-confirm">
+          <span id="delete-confirm-text">Ya, Hapus</span>
+          <span id="delete-confirm-spinner" class="spinner hidden"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart.js: library JavaScript tambahan untuk visualisasi grafik (diperbolehkan di atas HTML5 & CSS) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+</html>

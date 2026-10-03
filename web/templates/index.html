@@ -1,0 +1,310 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Grand Azura Hotel</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- navbar -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="/" class="nav-logo">
+        <span class="logo-symbol">✦</span>
+        <span class="logo-text">The Grand Azura</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="#rooms">Kamar</a></li>
+        <li><a href="#amenities">Fasilitas</a></li>
+        <li><a href="#about">Tentang</a></li>
+        <li><a href="/my-booking">Cek Reservasi</a></li>
+        <li><a href="/staff/login" class="nav-staff">Staff Login</a></li>
+        <li><a href="/booking" class="nav-cta">Pesan Sekarang</a></li>
+      </ul>
+      <!-- tombol hamburger untuk mobile -->
+      <button class="hamburger" id="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- hero section -->
+  <section class="hero">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <p class="hero-eyebrow">Selamat Datang di</p>
+      <h1 class="hero-title">The Grand Azura Hotel</h1>
+      <p class="hero-subtitle">Pengalaman menginap mewah di jantung kota dengan sentuhan keanggunan yang tak tertandingi</p>
+      <div class="hero-actions">
+        <a href="/booking" class="btn-primary">Reservasi Sekarang</a>
+        <a href="#rooms" class="btn-ghost">Lihat Kamar</a>
+      </div>
+    </div>
+    <!-- indikator scroll -->
+    <div class="hero-scroll">
+      <span>Scroll</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- bar cek ketersediaan kamar -->
+  <section class="avail-bar">
+    <div class="avail-container">
+      <div class="avail-field">
+        <label>Check-In</label>
+        <input type="date" id="checkin" />
+      </div>
+      <div class="avail-divider"></div>
+      <div class="avail-field">
+        <label>Check-Out</label>
+        <input type="date" id="checkout" />
+      </div>
+      <div class="avail-divider"></div>
+      <div class="avail-field">
+        <label>Tamu</label>
+        <select id="guests">
+          <option>1 Dewasa</option>
+          <option selected>2 Dewasa</option>
+          <option>3 Dewasa</option>
+          <option>2 Dewasa, 1 Anak</option>
+        </select>
+      </div>
+      <a href="/booking" class="btn-avail">Cek Ketersediaan</a>
+    </div>
+  </section>
+
+  <!-- strip statistik hotel -->
+  <section class="stats-strip">
+    <div class="stat-item">
+      <span class="stat-num">250+</span>
+      <span class="stat-label">Kamar Premium</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num">15+</span>
+      <span class="stat-label">Tahun Berpengalaman</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num">98%</span>
+      <span class="stat-label">Kepuasan Tamu</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num">5★</span>
+      <span class="stat-label">Rating Bintang Lima</span>
+    </div>
+  </section>
+
+  <!-- daftar kamar -->
+  <section class="rooms-section" id="rooms">
+    <div class="section-header">
+      <p class="section-eyebrow">Koleksi Kami</p>
+      <h2 class="section-title">Kamar & Suite</h2>
+      <p class="section-desc">Setiap ruangan dirancang untuk menciptakan harmoni sempurna antara kenyamanan dan estetika</p>
+    </div>
+    <div class="rooms-grid">
+
+      <!-- kamar deluxe (featured) -->
+      <div class="room-card featured">
+        <div class="room-img" style="background-image:url('https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800')"></div>
+        <div class="room-info">
+          <div class="room-badge">Paling Populer</div>
+          <h3>Deluxe Room</h3>
+          <p>Kamar nyaman dengan pemandangan kota yang menakjubkan dan fasilitas modern lengkap</p>
+          <div class="room-features">
+            <span>👥 2 Tamu</span>
+            <span>📐 32 m²</span>
+            <span>🛏 King Bed</span>
+          </div>
+          <div class="room-footer">
+            <div class="room-price">
+              <span class="price-from">Mulai dari</span>
+              <span class="price-num">Rp 1.200.000</span>
+              <span class="price-night">/malam</span>
+            </div>
+            <a href="/booking?room=C" class="btn-room">Pesan</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- kamar superior -->
+      <div class="room-card">
+        <div class="room-img" style="background-image:url('https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800')"></div>
+        <div class="room-info">
+          <h3>Superior Room</h3>
+          <p>Pilihan sempurna untuk perjalanan bisnis dengan ruang kerja eksklusif dan koneksi WiFi cepat</p>
+          <div class="room-features">
+            <span>👥 2 Tamu</span>
+            <span>📐 28 m²</span>
+            <span>🛏 Twin Bed</span>
+          </div>
+          <div class="room-footer">
+            <div class="room-price">
+              <span class="price-from">Mulai dari</span>
+              <span class="price-num">Rp 950.000</span>
+              <span class="price-night">/malam</span>
+            </div>
+            <a href="/booking?room=A" class="btn-room">Pesan</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- junior suite -->
+      <div class="room-card">
+        <div class="room-img" style="background-image:url('https://images.unsplash.com/photo-1578683010236-d716f9a3f461?w=800')"></div>
+        <div class="room-info">
+          <h3>Junior Suite</h3>
+          <p>Ruang tamu terpisah dengan balkon pribadi untuk pengalaman menginap yang lebih eksklusif</p>
+          <div class="room-features">
+            <span>👥 3 Tamu</span>
+            <span>📐 55 m²</span>
+            <span>🛏 King Bed</span>
+          </div>
+          <div class="room-footer">
+            <div class="room-price">
+              <span class="price-from">Mulai dari</span>
+              <span class="price-num">Rp 2.500.000</span>
+              <span class="price-night">/malam</span>
+            </div>
+            <a href="/booking?room=F" class="btn-room">Pesan</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- presidential suite -->
+      <div class="room-card">
+        <div class="room-img" style="background-image:url('https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=800')"></div>
+        <div class="room-info">
+          <h3>Presidential Suite</h3>
+          <p>Kemewahan tanpa kompromi dengan butler pribadi, jacuzzi, dan pemandangan panorama 180°</p>
+          <div class="room-features">
+            <span>👥 4 Tamu</span>
+            <span>📐 120 m²</span>
+            <span>🛏 Super King</span>
+          </div>
+          <div class="room-footer">
+            <div class="room-price">
+              <span class="price-from">Mulai dari</span>
+              <span class="price-num">Rp 8.500.000</span>
+              <span class="price-night">/malam</span>
+            </div>
+            <a href="/booking?room=L" class="btn-room">Pesan</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- fasilitas hotel -->
+  <section class="amenities-section" id="amenities">
+    <div class="amenities-inner">
+      <div class="amenities-text">
+        <p class="section-eyebrow">Fasilitas Kami</p>
+        <h2 class="section-title">Nikmati Setiap Momen</h2>
+        <p>Kami menghadirkan pengalaman terlengkap untuk setiap tamu — dari restoran berbintang hingga spa kelas dunia</p>
+        <div class="amenities-list">
+          <div class="amenity-item"><span class="amenity-icon">🏊</span><div><strong>Infinity Pool</strong><p>Kolam renang dengan pemandangan cakrawala kota</p></div></div>
+          <div class="amenity-item"><span class="amenity-icon">🍽</span><div><strong>Fine Dining</strong><p>3 restoran dengan chef internasional berpengalaman</p></div></div>
+          <div class="amenity-item"><span class="amenity-icon">💆</span><div><strong>Luxury Spa</strong><p>Perawatan tubuh dan relaksasi total dengan produk premium</p></div></div>
+          <div class="amenity-item"><span class="amenity-icon">🏋</span><div><strong>Fitness Center</strong><p>Peralatan modern dengan personal trainer tersedia</p></div></div>
+        </div>
+      </div>
+      <!-- galeri foto fasilitas -->
+      <div class="amenities-gallery">
+        <div class="gallery-main" style="background-image:url('https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800')"></div>
+        <div class="gallery-sm gallery-sm-1" style="background-image:url('https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=400')"></div>
+        <div class="gallery-sm gallery-sm-2" style="background-image:url('https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400')"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ulasan tamu -->
+  <section class="testimonials-section">
+    <div class="section-header">
+      <p class="section-eyebrow">Ulasan Tamu</p>
+      <h2 class="section-title">Apa Kata Mereka</h2>
+    </div>
+    <div class="testimonials-track">
+      <div class="testimonial-card">
+        <div class="stars">★★★★★</div>
+        <p>"Pengalaman menginap yang benar-benar tak terlupakan. Kamarnya luar biasa mewah dan pelayanannya sangat profesional."</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">AN</div>
+          <div><strong>Ahmad Nuryanto</strong><span>Jakarta</span></div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <div class="stars">★★★★★</div>
+        <p>"Spa-nya luar biasa! Saya merasa sangat rileks setelah sesi perawatan. Pasti akan kembali lagi kesini."</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">SR</div>
+          <div><strong>Sari Rahmawati</strong><span>Surabaya</span></div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <div class="stars">★★★★★</div>
+        <p>"Restoran hotelnya benar-benar kelas dunia. Makanannya lezat dan pemandangannya indah sekali."</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">BW</div>
+          <div><strong>Budi Wirawan</strong><span>Bandung</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- tentang hotel -->
+  <section class="about-section" id="about">
+    <div class="about-inner">
+      <div class="about-img" style="background-image:url('https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=800')"></div>
+      <div class="about-text">
+        <p class="section-eyebrow">Cerita Kami</p>
+        <h2 class="section-title">Warisan Keanggunan Sejak 2008</h2>
+        <p>The Grand Azura Hotel berdiri dengan visi tunggal: menghadirkan keramahan autentik Indonesia dalam balutan kemewahan internasional. Selama lebih dari 15 tahun, kami telah menjadi rumah kedua bagi ribuan tamu dari seluruh dunia.</p>
+        <p>Setiap detail dirancang dengan penuh perhatian — dari arsitektur bangunan hingga pilihan bantal di kamar Anda.</p>
+        <a href="/booking" class="btn-primary" style="display:inline-block;margin-top:1.5rem">Reservasi Sekarang</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- footer -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <span class="logo-symbol">✦</span>
+        <span class="logo-text">The Grand Azura</span>
+        <p>Jl. Sudirman No. 88, Jakarta Pusat<br/>📞 +62 21 5555-8888<br/>✉ reservasi@grandazura.com</p>
+      </div>
+      <div class="footer-links">
+        <h4>Navigasi</h4>
+        <a href="#rooms">Kamar & Suite</a>
+        <a href="#amenities">Fasilitas</a>
+        <a href="#about">Tentang Kami</a>
+        <a href="/booking">Reservasi</a>
+      </div>
+      <div class="footer-links">
+        <h4>Layanan</h4>
+        <a href="#">Pernikahan & Event</a>
+        <a href="#">Paket Bulan Madu</a>
+        <a href="#">Perjalanan Bisnis</a>
+        <a href="#">Restoran & Bar</a>
+      </div>
+      <div class="footer-links">
+        <h4>Informasi</h4>
+        <a href="#">Kebijakan Privasi</a>
+        <a href="#">Syarat & Ketentuan</a>
+        <a href="#">FAQ</a>
+        <a href="/staff/login" class="staff-link">Staff Dashboard</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2024 The Grand Azura Hotel. Seluruh hak cipta dilindungi.</p>
+    </div>
+  </footer>
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

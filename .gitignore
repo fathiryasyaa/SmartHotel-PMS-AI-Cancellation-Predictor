@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+
+# Virtual environment
+venv/
+env/
+.venv/
+
+# Flask
+instance/
+.env
+*.env
+
+# Database / credentials
+*.db
+*.sqlite3
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# VS Code
+.vscode/
+
+# Model files (opsional - uncomment kalau mau exclude model besar)
+# web/model/*.pkl
+# web/model/*.json
+
+# Logs
+*.log

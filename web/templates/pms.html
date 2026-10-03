@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PMS — Property Management System | The Grand Azura</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/pms.css') }}" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet" />
+</head>
+<body class="dashboard-body">
+
+  <!-- SIDEBAR (sama seperti dashboard) -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <span class="logo-symbol">✦</span>
+      <span class="logo-text">Grand Azura</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="/dashboard" class="sidebar-link">
+        <span class="sidebar-icon">📊</span> Dashboard Risiko
+      </a>
+      <a href="/pms" class="sidebar-link active">
+        <span class="sidebar-icon">🏨</span> PMS
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="/" class="sidebar-link">
+        <span class="sidebar-icon">🏠</span> Kembali ke Website
+      </a>
+      <a href="/staff/logout" class="sidebar-link" style="color:rgba(255,100,100,0.7)">
+        <span class="sidebar-icon">🚪</span> Logout
+      </a>
+    </div>
+  </aside>
+
+  <main class="dash-main">
+
+    <!-- TOPBAR -->
+    <header class="dash-topbar">
+      <div class="topbar-left">
+        <button class="sidebar-toggle" id="sidebar-toggle">☰</button>
+        <div>
+          <h1 class="topbar-title">Property Management System</h1>
+          <p class="topbar-sub">The Grand Azura Hotel — Check-In · Check-Out · Status Tamu</p>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-badge">
+          <span class="live-dot"></span> Live
+        </div>
+        <div class="topbar-date" id="topbar-date"></div>
+      </div>
+    </header>
+
+    <div class="pms-body">
+
+      <!-- KPI STRIP -->
+      <div class="pms-kpi-grid">
+        <div class="pms-kpi reserved">
+          <span class="pms-kpi-num" id="pms-reserved">0</span>
+          <span class="pms-kpi-label">🗓 Reservasi</span>
+        </div>
+        <div class="pms-kpi checkin">
+          <span class="pms-kpi-num" id="pms-checkin">0</span>
+          <span class="pms-kpi-label">🟢 Check-In</span>
+        </div>
+        <div class="pms-kpi checkout">
+          <span class="pms-kpi-num" id="pms-checkout">0</span>
+          <span class="pms-kpi-label">🔵 Check-Out</span>
+        </div>
+        <div class="pms-kpi canceled">
+          <span class="pms-kpi-num" id="pms-canceled">0</span>
+          <span class="pms-kpi-label">🔴 Dibatalkan</span>
+        </div>
+        <div class="pms-kpi noshow">
+          <span class="pms-kpi-num" id="pms-noshow">0</span>
+          <span class="pms-kpi-label">⚫ No Show</span>
+        </div>
+      </div>
+
+      <!-- FILTER TOOLBAR -->
+      <div class="pms-toolbar">
+        <input type="text" id="pms-search" placeholder="Cari ID atau nama tamu..." class="search-input" />
+        <div class="pms-filter-tabs" id="pms-filter-tabs">
+          <button class="pms-tab active" data-status="">Semua</button>
+          <button class="pms-tab" data-status="reserved">Reservasi</button>
+          <button class="pms-tab" data-status="checked_in">Check-In</button>
+          <button class="pms-tab" data-status="checked_out">Check-Out</button>
+          <button class="pms-tab" data-status="canceled_guest">Batal (Tamu)</button>
+          <button class="pms-tab" data-status="canceled_staff">Batal (Staff)</button>
+          <button class="pms-tab" data-status="no_show">No Show</button>
+        </div>
+      </div>
+
+      <!-- TAMU TABLE -->
+      <div class="table-card">
+        <div class="table-scroll">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Booking ID</th>
+                <th>Tamu</th>
+                <th>Hotel</th>
+                <th>Kedatangan</th>
+                <th>Durasi</th>
+                <th>Kamar</th>
+                <th>Risiko AI</th>
+                <th>Status PMS</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="pms-tbody">
+              <tr class="empty-row"><td colspan="9">Memuat data...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ── STATUS UPDATE MODAL ── -->
+  <div class="modal-overlay hidden" id="pms-modal">
+    <div class="modal-card">
+      <div class="modal-icon" id="pms-modal-icon">🏨</div>
+      <h3 id="pms-modal-title">Update Status</h3>
+      <p>Reservasi <strong id="pms-modal-id"></strong> — <strong id="pms-modal-name"></strong></p>
+      <p class="pms-current-status-line">Status saat ini: <span id="pms-modal-current" class="pms-status-badge"></span></p>
+
+      <div class="pms-action-grid" id="pms-action-grid">
+        <!-- diisi JS -->
+      </div>
+
+      <div class="modal-field" id="pms-note-wrap" style="display:none">
+        <label for="pms-note">Catatan (opsional)</label>
+        <input type="text" id="pms-note" placeholder="Mis: Tamu meminta kamar lain, dll." />
+      </div>
+
+      <p class="modal-error hidden" id="pms-modal-error"></p>
+
+      <div class="modal-actions">
+        <button class="btn-modal-cancel" id="pms-modal-cancel">Tutup</button>
+        <button class="btn-modal-confirm" id="pms-modal-confirm" style="display:none">
+          <span id="pms-confirm-text">Konfirmasi</span>
+          <span id="pms-confirm-spinner" class="spinner hidden"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/pms.js') }}"></script>
+</body>
+</html>

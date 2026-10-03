@@ -1,0 +1,487 @@
+/* =========================================================
+   INDEX.CSS — Landing Page Styles
+   ========================================================= */
+
+/* ── HERO ──────────────────────────────────────────────── */
+.hero {
+  position: relative;
+  height: 100vh;
+  min-height: 640px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: url('https://images.unsplash.com/photo-1455587734955-081b22074882?w=1600') center/cover no-repeat;
+  overflow: hidden;
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0,0,0,0.55) 0%,
+    rgba(0,0,0,0.4) 50%,
+    rgba(0,0,0,0.65) 100%
+  );
+}
+
+.hero-content {
+  position: relative;
+  text-align: center;
+  color: var(--white);
+  padding: 0 1.5rem;
+  max-width: 760px;
+  animation: fadeUp 1s ease both;
+}
+
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(30px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+.hero-eyebrow {
+  font-size: 0.8rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--gold-light);
+  margin-bottom: 1rem;
+  opacity: 0.9;
+}
+
+.hero-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2.8rem, 7vw, 5.5rem);
+  font-weight: 400;
+  color: var(--white);
+  line-height: 1.1;
+  margin-bottom: 1.2rem;
+  text-shadow: 0 2px 20px rgba(0,0,0,0.3);
+}
+
+.hero-subtitle {
+  font-size: 1rem;
+  color: rgba(255,255,255,0.82);
+  margin-bottom: 2.5rem;
+  line-height: 1.8;
+  max-width: 520px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.hero-scroll {
+  position: absolute;
+  bottom: 2.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  color: rgba(255,255,255,0.5);
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.scroll-line {
+  width: 1px;
+  height: 48px;
+  background: linear-gradient(to bottom, rgba(255,255,255,0.5), transparent);
+  animation: scrollAnim 1.8s ease-in-out infinite;
+}
+@keyframes scrollAnim {
+  0%,100% { transform: scaleY(1); opacity:1; }
+  50%      { transform: scaleY(0.5); opacity:0.4; }
+}
+
+/* ── AVAILABILITY BAR ────────────────────────────────── */
+.avail-bar {
+  background: var(--white);
+  box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+  position: relative;
+  z-index: 10;
+  margin-top: -1px;
+}
+
+.avail-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: flex;
+  align-items: center;
+  height: 88px;
+  gap: 0;
+}
+
+.avail-field {
+  flex: 1;
+  padding: 0.5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.avail-field label {
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-weight: 600;
+}
+
+.avail-field input,
+.avail-field select {
+  border: none;
+  outline: none;
+  font-size: 0.92rem;
+  color: var(--charcoal);
+  background: transparent;
+  cursor: pointer;
+}
+
+.avail-divider {
+  width: 1px;
+  height: 40px;
+  background: var(--border);
+}
+
+.btn-avail {
+  background: var(--gold);
+  color: var(--dark);
+  padding: 0 2.5rem;
+  height: 52px;
+  border-radius: 4px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  margin-left: 1.5rem;
+  transition: background var(--trans);
+  display: flex;
+  align-items: center;
+}
+.btn-avail:hover { background: var(--gold-light); }
+
+/* ── STATS STRIP ─────────────────────────────────────── */
+.stats-strip {
+  background: var(--dark);
+  display: flex;
+  justify-content: center;
+  gap: 0;
+}
+
+.stat-item {
+  flex: 1;
+  max-width: 280px;
+  padding: 2.5rem 2rem;
+  text-align: center;
+  border-right: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.stat-item:last-child { border-right: none; }
+
+.stat-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.4rem;
+  color: var(--gold);
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.45);
+}
+
+/* ── ROOMS ───────────────────────────────────────────── */
+.rooms-section {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 6rem 2rem;
+}
+
+.rooms-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+}
+
+.room-card {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  transition: transform var(--trans), box-shadow var(--trans);
+  background: var(--white);
+}
+.room-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-lg);
+}
+
+.room-img {
+  height: 220px;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+
+.room-card.featured .room-img { height: 260px; }
+
+.room-info {
+  padding: 1.5rem;
+  position: relative;
+}
+
+.room-badge {
+  position: absolute;
+  top: -14px; left: 1.5rem;
+  background: var(--gold);
+  color: var(--dark);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+}
+
+.room-info h3 {
+  font-size: 1.4rem;
+  margin-bottom: 0.5rem;
+  margin-top: 0.4rem;
+}
+
+.room-info p {
+  font-size: 0.85rem;
+  color: var(--mid);
+  margin-bottom: 1rem;
+  line-height: 1.65;
+}
+
+.room-features {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.2rem;
+}
+
+.room-features span {
+  font-size: 0.78rem;
+  color: var(--mid);
+  background: var(--cream);
+  padding: 0.25rem 0.65rem;
+  border-radius: 20px;
+}
+
+.room-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.room-price {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.price-from { font-size: 0.7rem; color: var(--light-text); }
+.price-num  { font-size: 1.1rem; font-weight: 600; color: var(--dark); }
+.price-night { font-size: 0.72rem; color: var(--light-text); }
+
+.btn-room {
+  background: var(--dark);
+  color: var(--white);
+  padding: 0.6rem 1.3rem;
+  border-radius: 4px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition: background var(--trans);
+}
+.btn-room:hover { background: var(--gold); color: var(--dark); }
+
+/* ── AMENITIES ───────────────────────────────────────── */
+.amenities-section {
+  background: var(--cream);
+  padding: 6rem 2rem;
+}
+
+.amenities-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5rem;
+  align-items: center;
+}
+
+.amenities-text > p {
+  color: var(--mid);
+  margin-bottom: 2rem;
+  font-size: 0.92rem;
+}
+
+.amenities-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.amenity-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.amenity-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  width: 44px; height: 44px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--white);
+  border-radius: 50%;
+  box-shadow: var(--shadow);
+}
+
+.amenity-item strong { display: block; margin-bottom: 0.2rem; font-size: 0.95rem; }
+.amenity-item p { font-size: 0.82rem; color: var(--mid); margin: 0; }
+
+.amenities-gallery {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 260px 160px;
+  gap: 1rem;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.gallery-main {
+  grid-column: 1 / -1;
+  background-size: cover;
+  background-position: center;
+  border-radius: var(--radius);
+}
+
+.gallery-sm {
+  background-size: cover;
+  background-position: center;
+  border-radius: var(--radius);
+}
+
+/* ── TESTIMONIALS ────────────────────────────────────── */
+.testimonials-section {
+  padding: 6rem 2rem;
+  background: var(--white);
+}
+
+.testimonials-track {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+}
+
+.testimonial-card {
+  background: var(--cream);
+  padding: 2rem;
+  border-radius: var(--radius-lg);
+  border-left: 3px solid var(--gold);
+  transition: transform var(--trans);
+}
+.testimonial-card:hover { transform: translateY(-4px); }
+
+.stars { color: var(--gold); font-size: 1rem; margin-bottom: 1rem; }
+
+.testimonial-card p {
+  font-size: 0.9rem;
+  color: var(--mid);
+  font-style: italic;
+  line-height: 1.75;
+  margin-bottom: 1.5rem;
+}
+
+.testimonial-author {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.author-avatar {
+  width: 40px; height: 40px;
+  background: var(--gold);
+  color: var(--dark);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.78rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.testimonial-author strong { display: block; font-size: 0.88rem; }
+.testimonial-author span  { font-size: 0.78rem; color: var(--light-text); }
+
+/* ── ABOUT ───────────────────────────────────────────── */
+.about-section {
+  background: var(--dark);
+  padding: 6rem 2rem;
+}
+
+.about-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5rem;
+  align-items: center;
+}
+
+.about-img {
+  height: 520px;
+  border-radius: var(--radius-lg);
+  background-size: cover;
+  background-position: center;
+  box-shadow: var(--shadow-lg);
+}
+
+.about-text .section-eyebrow { color: var(--gold); }
+.about-text .section-title { color: var(--white); }
+.about-text p {
+  color: rgba(255,255,255,0.65);
+  font-size: 0.92rem;
+  margin-bottom: 1.2rem;
+  line-height: 1.8;
+}
+
+/* ── RESPONSIVE ──────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .amenities-inner,
+  .about-inner { grid-template-columns: 1fr; }
+  .amenities-gallery { order: -1; grid-template-rows: 220px 140px; }
+  .about-img { height: 340px; }
+}
+
+@media (max-width: 768px) {
+  .avail-container { flex-direction: column; height: auto; padding: 1.5rem; gap: 1rem; }
+  .avail-divider   { display: none; }
+  .avail-field     { padding: 0; width: 100%; }
+  .btn-avail       { width: 100%; justify-content: center; margin-left: 0; }
+  .stats-strip     { flex-wrap: wrap; }
+  .stat-item       { flex: 1 1 50%; }
+  .testimonials-track { grid-template-columns: 1fr; }
+}

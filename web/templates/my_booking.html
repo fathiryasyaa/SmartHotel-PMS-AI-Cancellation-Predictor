@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cek Reservasi — The Grand Azura Hotel</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/my_booking.css') }}" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar navbar-solid" id="navbar">
+    <div class="nav-container">
+      <a href="/" class="nav-logo">
+        <span class="logo-symbol">✦</span>
+        <span class="logo-text">The Grand Azura</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="/#rooms">Kamar</a></li>
+        <li><a href="/#amenities">Fasilitas</a></li>
+        <li><a href="/my-booking" class="nav-cta active">Cek Reservasi</a></li>
+        <li><a href="/booking" class="nav-cta">Pesan Sekarang</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div class="page-header-overlay"></div>
+    <div class="page-header-content">
+      <p class="section-eyebrow">The Grand Azura Hotel</p>
+      <h1>Cek & Kelola Reservasi</h1>
+      <p>Masukkan email dan nama Anda untuk melihat atau membatalkan reservasi</p>
+    </div>
+  </div>
+
+  <section class="mybooking-section">
+    <div class="mybooking-container">
+
+      <!-- LOOKUP FORM -->
+      <div class="lookup-card" id="lookup-card">
+        <div class="lookup-icon">📧</div>
+        <h2>Temukan Reservasi Anda</h2>
+        <p>Masukkan email dan nama yang digunakan saat melakukan reservasi. Semua reservasi terdaftar akan ditampilkan.</p>
+
+        <form id="lookup-form" class="lookup-form" novalidate>
+          <div class="form-group">
+            <label for="lookup-email">Email</label>
+            <input type="email" id="lookup-email" placeholder="email@contoh.com"
+                   autocomplete="email" required />
+          </div>
+          <div class="form-group">
+            <label for="guest-name-input">Nama Tamu</label>
+            <input type="text" id="guest-name-input"
+                   placeholder="Nama sesuai saat pemesanan" required />
+          </div>
+          <p class="lookup-error hidden" id="lookup-error"></p>
+          <button type="submit" class="btn-lookup" id="lookup-btn">
+            <span id="lookup-text">Cari Reservasi</span>
+            <span id="lookup-spinner" class="spinner-dark hidden"></span>
+          </button>
+        </form>
+      </div>
+
+      <!-- DAFTAR RESERVASI (jika >1) -->
+      <div class="booking-list hidden" id="booking-list">
+        <div class="booking-list-header">
+          <h2 id="booking-list-title">Reservasi Anda</h2>
+          <button class="btn-back-lookup" id="btn-back-list">← Cari Lain</button>
+        </div>
+        <div id="booking-list-cards"></div>
+      </div>
+
+      <!-- BOOKING DETAIL CARD -->
+      <div class="booking-detail hidden" id="booking-detail">
+        <div class="detail-header">
+          <div class="detail-header-left">
+            <div class="detail-id" id="detail-id"></div>
+            <h2 id="detail-name"></h2>
+            <div id="detail-status-badge"></div>
+          </div>
+          <button class="btn-back-lookup" id="btn-back-lookup">← Daftar Reservasi</button>
+        </div>
+
+        <div class="detail-grid" id="detail-grid"></div>
+        <div class="detail-risk-box" id="detail-risk-box"></div>
+
+        <div class="cancel-section" id="cancel-section">
+          <div class="cancel-section-header">
+            <span class="cancel-icon">⚠️</span>
+            <div>
+              <strong>Batalkan Reservasi</strong>
+              <p id="cancel-policy-note"></p>
+            </div>
+          </div>
+          <div class="cancel-form">
+            <div class="form-group">
+              <label for="cancel-reason-input">Alasan Pembatalan (opsional)</label>
+              <input type="text" id="cancel-reason-input"
+                     placeholder="Contoh: Perubahan rencana perjalanan..." />
+            </div>
+            <button class="btn-cancel-booking" id="btn-cancel-booking">
+              <span id="cancel-text">Batalkan Reservasi Ini</span>
+              <span id="cancel-spinner" class="spinner-white hidden"></span>
+            </button>
+          </div>
+        </div>
+
+        <div class="final-status-box hidden" id="final-status-box"></div>
+      </div>
+
+      <!-- CANCEL SUCCESS -->
+      <div class="cancel-success hidden" id="cancel-success">
+        <div class="success-icon">✅</div>
+        <h2>Pembatalan Berhasil</h2>
+        <div class="success-id" id="success-id"></div>
+        <p id="success-deposit-note"></p>
+        <div class="success-actions">
+          <a href="/" class="btn-primary">Kembali ke Beranda</a>
+          <a href="/booking" class="btn-ghost"
+             style="color:var(--mid);border-color:var(--border)">Buat Reservasi Baru</a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <footer class="footer footer-minimal">
+    <div class="footer-bottom">
+      <p>© 2024 The Grand Azura Hotel. Seluruh hak cipta dilindungi.</p>
+    </div>
+  </footer>
+
+  <script src="{{ url_for('static', filename='js/my_booking.js') }}"></script>
+</body>
+</html>
