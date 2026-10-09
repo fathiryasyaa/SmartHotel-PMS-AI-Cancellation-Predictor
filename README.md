@@ -1,4 +1,4 @@
-# The Grand Azura — Hotel Booking & Cancellation Prediction System
+# Hotel Booking & Cancellation Prediction System
 
 Aplikasi web sistem reservasi hotel *end-to-end* yang mengintegrasikan model *Machine Learning* (XGBoost) untuk memprediksi probabilitas pembatalan reservasi tamu secara *real-time*. Dilengkapi modul Property Management System (PMS) dan Dashboard Analitik untuk operasional staf hotel.
 
