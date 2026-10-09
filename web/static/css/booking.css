@@ -493,6 +493,9 @@
 }
 .rpc-soldout-badge { background: var(--danger); color: var(--white); }
 .rpc-limited-badge { background: var(--warning); color: var(--dark); }
+.rpc-avail-badge   { background: #22c55e; color: #fff; }
+.rpc-loading-badge { background: rgba(0,0,0,.45); color: #ddd; animation: pulse-badge .9s infinite alternate; }
+@keyframes pulse-badge { from { opacity:.4; } to { opacity:1; } }
 
 .rpc-body { padding: 1rem; }
 
@@ -634,4 +637,319 @@
 
 @media (max-width: 640px) {
   .room-picker-grid { grid-template-columns: 1fr; }
+}
+
+/* ── GUEST TYPE CARDS ────────────────────────────────── */
+.guest-type-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: .85rem;
+  margin-top: .5rem;
+}
+
+.guest-type-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .4rem;
+  padding: 1.2rem .8rem;
+  background: var(--light);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all .2s ease;
+  text-align: center;
+  font-family: inherit;
+}
+
+.guest-type-card:hover {
+  border-color: var(--gold);
+  background: #faf6ee;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0,0,0,.08);
+}
+
+.guest-type-card.selected {
+  border-color: var(--gold);
+  background: linear-gradient(135deg, #fdf5e0 0%, #faf0cc 100%);
+  box-shadow: 0 0 0 3px rgba(193,156,55,.2);
+}
+
+.guest-type-card .gtc-icon {
+  font-size: 2rem;
+  line-height: 1;
+  display: block;
+}
+
+.guest-type-card strong {
+  font-size: .92rem;
+  color: var(--dark);
+  font-weight: 600;
+}
+
+.guest-type-card span:not(.gtc-icon) {
+  font-size: .75rem;
+  color: var(--mid);
+  line-height: 1.3;
+}
+
+@media (max-width: 640px) {
+  .guest-type-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ══════════════════════════════════════════════════════════
+   HOTEL PICK ROW (Step 0 — sebelum pilih kamar)
+   ══════════════════════════════════════════════════════════ */
+.hotel-pick-row {
+  margin-bottom: 1.6rem;
+}
+.hotel-pick-label {
+  display: block;
+  font-size: .72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--mid);
+  margin-bottom: .6rem;
+}
+.hotel-pick-group {
+  display: flex;
+  gap: .8rem;
+}
+.hotel-pick-card {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: .9rem;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: .75rem 1.1rem;
+  cursor: pointer;
+  background: var(--white);
+  transition: border-color .2s, background .2s;
+}
+.hotel-pick-card:has(input:checked),
+.hotel-pick-card.active {
+  border-color: var(--gold);
+  background: #fdf8ec;
+  box-shadow: 0 3px 12px rgba(184, 150, 90, 0.14);
+}
+.hotel-pick-card:hover { border-color: var(--gold); }
+.hotel-pick-content strong {
+  display: block;
+  font-size: .9rem;
+  font-weight: 700;
+  color: var(--dark);
+  letter-spacing: .03em;
+}
+.hotel-pick-content small {
+  font-size: .72rem;
+  color: var(--mid);
+  margin-top: .1rem;
+  display: block;
+}
+@media (max-width: 540px) {
+  .hotel-pick-group { flex-direction: column; }
+}
+
+/* ══════════════════════════════════════════════════════════
+   DATE RANGE PICKER
+   ══════════════════════════════════════════════════════════ */
+.drp-wrapper { position: relative; }
+
+/* ── Input bar (Check-in / Check-out) ── */
+.drp-inputs {
+  display: flex;
+  align-items: stretch;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--white);
+  cursor: pointer;
+  transition: border-color .2s;
+  overflow: hidden;
+}
+.drp-inputs:hover,
+.drp-inputs.open { border-color: var(--gold); }
+
+.drp-field {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: .75rem 1.1rem;
+  gap: .15rem;
+  transition: background .15s;
+}
+.drp-field:hover,
+.drp-field.active { background: #fdf8ec; }
+
+.drp-label {
+  font-size: .68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--gold);
+}
+.drp-value {
+  font-size: .95rem;
+  font-weight: 600;
+  color: var(--dark);
+}
+.drp-value.placeholder { color: var(--mid); font-weight: 400; }
+
+.drp-separator {
+  width: 1px;
+  background: var(--border);
+  margin: .5rem 0;
+}
+
+/* ── Summary line ── */
+.drp-summary {
+  margin-top: .6rem;
+  font-size: .82rem;
+  color: var(--mid);
+}
+.drp-summary strong { color: var(--dark); }
+.drp-summary .drp-nights {
+  color: var(--gold);
+  font-weight: 700;
+}
+
+/* ── Calendar popup ── */
+.drp-calendar {
+  position: absolute;
+  top: calc(100% + .4rem);
+  left: 0;
+  z-index: 500;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 8px 40px rgba(0,0,0,.14);
+  padding: 1.2rem;
+  min-width: 680px;
+  animation: drp-fade .15s ease;
+}
+@keyframes drp-fade {
+  from { opacity:0; transform:translateY(-6px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+/* ── Calendar header (month names + nav) ── */
+.drp-cal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+.drp-months {
+  display: flex;
+  gap: 2.8rem;
+  font-weight: 700;
+  font-size: .9rem;
+  color: var(--dark);
+}
+.drp-nav {
+  background: none;
+  border: 1.5px solid var(--border);
+  border-radius: 50%;
+  width: 2rem; height: 2rem;
+  cursor: pointer;
+  font-size: 1rem;
+  color: var(--dark);
+  transition: all .15s;
+  display: flex; align-items: center; justify-content: center;
+}
+.drp-nav:hover { background: var(--gold); color: #fff; border-color: var(--gold); }
+
+/* ── Calendar body: two months side by side ── */
+.drp-cal-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 2rem;
+}
+
+/* ── Single month grid ── */
+.drp-month-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+.drp-dow {
+  text-align: center;
+  font-size: .65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--mid);
+  padding: .3rem 0 .5rem;
+}
+.drp-dow.weekend { color: var(--danger); }
+
+/* ── Day cells ── */
+.drp-day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: .4rem .1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: .82rem;
+  font-weight: 500;
+  color: var(--dark);
+  position: relative;
+  transition: background .12s, color .12s;
+  min-height: 44px;
+  gap: 2px;
+}
+.drp-day:hover:not(.disabled):not(.other-month) {
+  background: #fdf5e0;
+}
+.drp-day.other-month { opacity: 0; pointer-events: none; }
+.drp-day.disabled { color: #ccc; cursor: default; pointer-events: none; }
+.drp-day.today .drp-day-num { text-decoration: underline; text-decoration-color: var(--gold); }
+
+.drp-day-num { line-height: 1; }
+.drp-day-price {
+  font-size: .6rem;
+  font-weight: 400;
+  color: var(--mid);
+  line-height: 1;
+}
+
+/* Selected start / end */
+.drp-day.start, .drp-day.end {
+  background: var(--dark) !important;
+  color: #fff !important;
+  border-radius: 6px;
+}
+.drp-day.start .drp-day-price,
+.drp-day.end .drp-day-price { color: rgba(255,255,255,.65); }
+
+/* In-range highlight */
+.drp-day.in-range {
+  background: #fdf5e0;
+  border-radius: 0;
+  color: var(--dark);
+}
+.drp-day.range-start-edge { border-radius: 6px 0 0 6px; }
+.drp-day.range-end-edge   { border-radius: 0 6px 6px 0; }
+
+/* Tooltip for night count */
+.drp-day.end::after {
+  content: attr(data-nights);
+  position: absolute;
+  top: -28px;
+  left: 50%; transform: translateX(-50%);
+  background: var(--dark);
+  color: #fff;
+  font-size: .65rem;
+  font-weight: 600;
+  padding: .2rem .5rem;
+  border-radius: 4px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+@media (max-width: 720px) {
+  .drp-calendar { min-width: 320px; }
+  .drp-cal-body { grid-template-columns: 1fr; }
 }

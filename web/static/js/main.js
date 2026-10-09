@@ -1,4 +1,4 @@
-﻿// main.js - script global yang dipakai di semua halaman
+// main.js - script global yang dipakai di semua halaman
 
 // navbar berubah warna saat di-scroll
 const navbar = document.getElementById('navbar');
@@ -27,28 +27,6 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
   });
 });
 
-// isi default tanggal check-in dan check-out di availability bar
-const checkinInput  = document.getElementById('checkin');
-const checkoutInput = document.getElementById('checkout');
-if (checkinInput && checkoutInput) {
-  const today    = new Date();
-  const tomorrow = new Date(today);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  const dayAfter  = new Date(today);
-  dayAfter.setDate(dayAfter.getDate() + 3);
-
-  checkinInput.value  = today.toISOString().split('T')[0];
-  checkoutInput.value = dayAfter.toISOString().split('T')[0];
-
-  // pastikan checkout selalu setelah checkin
-  checkinInput.addEventListener('change', () => {
-    if (checkoutInput.value <= checkinInput.value) {
-      const next = new Date(checkinInput.value);
-      next.setDate(next.getDate() + 1);
-      checkoutInput.value = next.toISOString().split('T')[0];
-    }
-  });
-}
 
 // animasi fade-in saat elemen masuk ke layar (scroll reveal)
 const animTargets = document.querySelectorAll(

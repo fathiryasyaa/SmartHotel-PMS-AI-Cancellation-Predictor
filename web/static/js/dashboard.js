@@ -1,4 +1,4 @@
-﻿// dashboard.js - logika halaman staff dashboard
+// dashboard.js - logika halaman staff dashboard
 
 // variabel global
 let allBookings   = [];      // semua data reservasi
@@ -240,18 +240,41 @@ function renderAllTable(bookings) {
 
   // label status PMS dengan warna berbeda per status
   const PMS_LABELS = {
-    reserved:       '<span class="risk-badge" style="background:#EEF3FF;color:#2A4A9A">🗓 Aktif</span>',
-    checked_in:     '<span class="risk-badge" style="background:var(--success-bg);color:var(--success)">✅ Check-In</span>',
-    checked_out:    '<span class="risk-badge" style="background:#E8F0FE;color:#1A4AD4">🔵 Check-Out</span>',
-    canceled_guest: '<span class="risk-badge" style="background:var(--danger-bg);color:var(--danger)">❌ Batal (Tamu)</span>',
-    canceled_staff: '<span class="risk-badge" style="background:var(--danger-bg);color:var(--danger)">❌ Batal (Staff)</span>',
-    no_show:        '<span class="risk-badge" style="background:#F5F5F5;color:#666">⚫ No Show</span>',
+    reserved:       '<span class="risk-badge" style="background:#EEF3FF;color:#2A4A9A">Aktif</span>',
+    checked_in:     '<span class="risk-badge" style="background:var(--success-bg);color:var(--success)">Check-In</span>',
+    checked_out:    '<span class="risk-badge" style="background:#E8F0FE;color:#1A4AD4">Check-Out</span>',
+    canceled_guest: '<span class="risk-badge" style="background:var(--danger-bg);color:var(--danger)">Batal (Tamu)</span>',
+    canceled_staff: '<span class="risk-badge" style="background:var(--danger-bg);color:var(--danger)">Batal (Staff)</span>',
+    no_show:        '<span class="risk-badge" style="background:#F5F5F5;color:#666">No Show</span>',
   };
 
-  tbody.innerHTML = bookings.map(b => `
+  tbody.innerHTML = bookings.map(b => {
+    const phoneDigits = (b.guest_phone || '').replace(/\D/g, '');
+    let waUrl = '';
+    if (phoneDigits) {
+      const waPrefix = phoneDigits.startsWith('0') ? '62' + phoneDigits.slice(1) : phoneDigits;
+      waUrl = `https://wa.me/${waPrefix}?text=${encodeURIComponent(`Halo ${b.guest_name}, kami dari The Grand Azura Hotel terkait reservasi ${b.id}.`)}`;
+    }
+
+    return `
     <tr data-id="${b.id}">
       <td><strong>${b.id}</strong></td>
-      <td>${escHtml(b.guest_name)}</td>
+      <td>
+        <div class="guest-info-cell">
+          <strong class="guest-name-title">${escHtml(b.guest_name)}</strong>
+          <div class="guest-contacts-row">
+            ${b.guest_phone
+              ? `<a href="tel:${escHtml(b.guest_phone)}" class="contact-btn phone" title="Telepon">${escHtml(b.guest_phone)}</a>
+                 ${waUrl ? `<a href="${waUrl}" target="_blank" rel="noopener" class="contact-btn wa" title="Chat WhatsApp">WhatsApp</a>` : ''}`
+              : `<span class="contact-empty">Telp: —</span>`
+            }
+          </div>
+          ${b.guest_email
+            ? `<div class="guest-email-row"><a href="mailto:${escHtml(b.guest_email)}" class="contact-btn email" title="Kirim Email">${escHtml(b.guest_email)}</a></div>`
+            : ''
+          }
+        </div>
+      </td>
       <td>${escHtml(b.hotel)}</td>
       <td>${b.arrival_date_day_of_month} ${b.arrival_date_month} ${b.arrival_date_year}</td>
       <td>${nights(b)} malam</td>
@@ -265,10 +288,11 @@ function renderAllTable(bookings) {
         <button class="btn-delete-row"
                 onclick="openDeleteModal('${b.id}','${escHtml(b.guest_name)}')"
                 title="Hapus reservasi">
-          🗑 Hapus
+          Hapus
         </button>
       </td>
-    </tr>`).join('');
+    </tr>`;
+  }).join('');
 }
 
 // render kartu-kartu reservasi risiko tinggi
@@ -278,15 +302,28 @@ function renderHighRiskCards(bookings) {
   if (!grid) return;
   if (count) count.textContent = `${bookings.length} reservasi`;
   if (!bookings.length) {
-    grid.innerHTML = '<div class="risk-card-empty">Tidak ada reservasi risiko tinggi saat ini ✅</div>';
+    grid.innerHTML = '<div class="risk-card-empty">Tidak ada reservasi risiko tinggi saat ini.</div>';
     return;
   }
-  grid.innerHTML = bookings.map(b => `
+  grid.innerHTML = bookings.map(b => {
+    const phoneDigits = (b.guest_phone || '').replace(/\D/g, '');
+    const waPrefix = phoneDigits.startsWith('0') ? '62' + phoneDigits.slice(1) : phoneDigits;
+    const waUrl = phoneDigits ? `https://wa.me/${waPrefix}?text=${encodeURIComponent(`Halo ${b.guest_name}, kami dari The Grand Azura Hotel terkait reservasi ${b.id}.`)}` : '';
+
+    return `
     <div class="risk-card">
       <div class="risk-card-header">
         <div>
           <h4>${escHtml(b.guest_name)}</h4>
           <div class="risk-card-id">${b.id} · ${b.created_at}</div>
+          <div class="guest-contacts-row" style="margin-top:.45rem">
+            ${b.guest_phone
+              ? `<a href="tel:${escHtml(b.guest_phone)}" class="contact-btn phone">${escHtml(b.guest_phone)}</a>
+                 ${waUrl ? `<a href="${waUrl}" target="_blank" rel="noopener" class="contact-btn wa">Hubungi via WA</a>` : ''}`
+              : '<span class="contact-empty">Telp: —</span>'
+            }
+            ${b.guest_email ? `<a href="mailto:${escHtml(b.guest_email)}" class="contact-btn email">${escHtml(b.guest_email)}</a>` : ''}
+          </div>
         </div>
         <div style="text-align:right">
           <div class="risk-prob-big">${b.probability}%</div>
@@ -302,13 +339,14 @@ function renderHighRiskCards(bookings) {
         <div class="risk-detail"><strong>${b.adults} orang</strong>Tamu</div>
       </div>
       <div class="risk-card-footer">
-        <div class="risk-card-policy">⚠️ ${escHtml(b.policy)}</div>
+        <div class="risk-card-policy">Kebijakan: ${escHtml(b.policy)}</div>
         <button class="btn-delete-card"
                 onclick="openDeleteModal('${b.id}','${escHtml(b.guest_name)}')">
-          🗑 Hapus
+          Hapus
         </button>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 // render tabel log reservasi yang sudah dihapus
@@ -431,10 +469,14 @@ function initFilters() {
   const filterSelect = document.getElementById('filter-risk');
 
   function applyFilter() {
-    const q    = (searchInput?.value || '').toLowerCase();
+    const q    = (searchInput?.value || '').toLowerCase().trim();
     const risk = filterSelect?.value || '';
     const filtered = allBookings.filter(b => {
-      const matchQ    = !q || b.guest_name.toLowerCase().includes(q) || b.id.toLowerCase().includes(q);
+      const matchQ    = !q ||
+        (b.guest_name || '').toLowerCase().includes(q) ||
+        (b.id || '').toLowerCase().includes(q) ||
+        (b.guest_phone || '').toLowerCase().includes(q) ||
+        (b.guest_email || '').toLowerCase().includes(q);
       const matchRisk = !risk || b.risk_level === risk;
       return matchQ && matchRisk;
     });

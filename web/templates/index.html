@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
@@ -52,36 +52,10 @@
     </div>
   </section>
 
-  <!-- bar cek ketersediaan kamar -->
-  <section class="avail-bar">
-    <div class="avail-container">
-      <div class="avail-field">
-        <label>Check-In</label>
-        <input type="date" id="checkin" />
-      </div>
-      <div class="avail-divider"></div>
-      <div class="avail-field">
-        <label>Check-Out</label>
-        <input type="date" id="checkout" />
-      </div>
-      <div class="avail-divider"></div>
-      <div class="avail-field">
-        <label>Tamu</label>
-        <select id="guests">
-          <option>1 Dewasa</option>
-          <option selected>2 Dewasa</option>
-          <option>3 Dewasa</option>
-          <option>2 Dewasa, 1 Anak</option>
-        </select>
-      </div>
-      <a href="/booking" class="btn-avail">Cek Ketersediaan</a>
-    </div>
-  </section>
-
   <!-- strip statistik hotel -->
   <section class="stats-strip">
     <div class="stat-item">
-      <span class="stat-num">250+</span>
+      <span class="stat-num">{{ total_rooms or 189 }}</span>
       <span class="stat-label">Kamar Premium</span>
     </div>
     <div class="stat-item">
@@ -113,16 +87,16 @@
         <div class="room-info">
           <div class="room-badge">Paling Populer</div>
           <h3>Deluxe Room</h3>
-          <p>Kamar nyaman dengan pemandangan kota yang menakjubkan dan fasilitas modern lengkap</p>
+          <p>Kamar nyaman dengan pemandangan menakjubkan dan fasilitas modern lengkap</p>
           <div class="room-features">
-            <span>👥 2 Tamu</span>
-            <span>📐 32 m²</span>
-            <span>🛏 King Bed</span>
+            <span>3 Tamu</span>
+            <span>36 m²</span>
+            <span>King Bed</span>
           </div>
           <div class="room-footer">
             <div class="room-price">
               <span class="price-from">Mulai dari</span>
-              <span class="price-num">Rp 1.200.000</span>
+              <span class="price-num">Rp 1.400.000</span>
               <span class="price-night">/malam</span>
             </div>
             <a href="/booking?room=C" class="btn-room">Pesan</a>
@@ -130,16 +104,16 @@
         </div>
       </div>
 
-      <!-- kamar superior -->
+      <!-- kamar standard -->
       <div class="room-card">
         <div class="room-img" style="background-image:url('https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800')"></div>
         <div class="room-info">
-          <h3>Superior Room</h3>
-          <p>Pilihan sempurna untuk perjalanan bisnis dengan ruang kerja eksklusif dan koneksi WiFi cepat</p>
+          <h3>Standard Room</h3>
+          <p>Pilihan tepat untuk perjalanan dinas atau wisata singkat dengan kenyamanan esensial</p>
           <div class="room-features">
-            <span>👥 2 Tamu</span>
-            <span>📐 28 m²</span>
-            <span>🛏 Twin Bed</span>
+            <span>2 Tamu</span>
+            <span>22 m²</span>
+            <span>Twin Bed</span>
           </div>
           <div class="room-footer">
             <div class="room-price">
@@ -159,14 +133,14 @@
           <h3>Junior Suite</h3>
           <p>Ruang tamu terpisah dengan balkon pribadi untuk pengalaman menginap yang lebih eksklusif</p>
           <div class="room-features">
-            <span>👥 3 Tamu</span>
-            <span>📐 55 m²</span>
-            <span>🛏 King Bed</span>
+            <span>4 Tamu</span>
+            <span>55 m²</span>
+            <span>King Bed</span>
           </div>
           <div class="room-footer">
             <div class="room-price">
               <span class="price-from">Mulai dari</span>
-              <span class="price-num">Rp 2.500.000</span>
+              <span class="price-num">Rp 1.900.000</span>
               <span class="price-night">/malam</span>
             </div>
             <a href="/booking?room=F" class="btn-room">Pesan</a>
@@ -179,16 +153,16 @@
         <div class="room-img" style="background-image:url('https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=800')"></div>
         <div class="room-info">
           <h3>Presidential Suite</h3>
-          <p>Kemewahan tanpa kompromi dengan butler pribadi, jacuzzi, dan pemandangan panorama 180°</p>
+          <p>Puncak kemewahan dengan panorama 180°, spa privat, dan fasilitas kelas dunia</p>
           <div class="room-features">
-            <span>👥 4 Tamu</span>
-            <span>📐 120 m²</span>
-            <span>🛏 Super King</span>
+            <span>6 Tamu</span>
+            <span>130 m²</span>
+            <span>Super King</span>
           </div>
           <div class="room-footer">
             <div class="room-price">
               <span class="price-from">Mulai dari</span>
-              <span class="price-num">Rp 8.500.000</span>
+              <span class="price-num">Rp 5.500.000</span>
               <span class="price-night">/malam</span>
             </div>
             <a href="/booking?room=L" class="btn-room">Pesan</a>
@@ -207,10 +181,10 @@
         <h2 class="section-title">Nikmati Setiap Momen</h2>
         <p>Kami menghadirkan pengalaman terlengkap untuk setiap tamu — dari restoran berbintang hingga spa kelas dunia</p>
         <div class="amenities-list">
-          <div class="amenity-item"><span class="amenity-icon">🏊</span><div><strong>Infinity Pool</strong><p>Kolam renang dengan pemandangan cakrawala kota</p></div></div>
-          <div class="amenity-item"><span class="amenity-icon">🍽</span><div><strong>Fine Dining</strong><p>3 restoran dengan chef internasional berpengalaman</p></div></div>
-          <div class="amenity-item"><span class="amenity-icon">💆</span><div><strong>Luxury Spa</strong><p>Perawatan tubuh dan relaksasi total dengan produk premium</p></div></div>
-          <div class="amenity-item"><span class="amenity-icon">🏋</span><div><strong>Fitness Center</strong><p>Peralatan modern dengan personal trainer tersedia</p></div></div>
+          <div class="amenity-item"><span class="amenity-icon">◈</span><div><strong>Infinity Pool</strong><p>Kolam renang dengan pemandangan cakrawala kota</p></div></div>
+          <div class="amenity-item"><span class="amenity-icon">◈</span><div><strong>Fine Dining</strong><p>3 restoran dengan chef internasional berpengalaman</p></div></div>
+          <div class="amenity-item"><span class="amenity-icon">◈</span><div><strong>Luxury Spa</strong><p>Perawatan tubuh dan relaksasi total dengan produk premium</p></div></div>
+          <div class="amenity-item"><span class="amenity-icon">◈</span><div><strong>Fitness Center</strong><p>Peralatan modern dengan personal trainer tersedia</p></div></div>
         </div>
       </div>
       <!-- galeri foto fasilitas -->
@@ -233,24 +207,24 @@
         <div class="stars">★★★★★</div>
         <p>"Pengalaman menginap yang benar-benar tak terlupakan. Kamarnya luar biasa mewah dan pelayanannya sangat profesional."</p>
         <div class="testimonial-author">
-          <div class="author-avatar">AN</div>
-          <div><strong>Ahmad Nuryanto</strong><span>Jakarta</span></div>
+          <div class="author-avatar">WL</div>
+          <div><strong>Wang lin</strong><span>Jakarta</span></div>
         </div>
       </div>
       <div class="testimonial-card">
         <div class="stars">★★★★★</div>
         <p>"Spa-nya luar biasa! Saya merasa sangat rileks setelah sesi perawatan. Pasti akan kembali lagi kesini."</p>
         <div class="testimonial-author">
-          <div class="author-avatar">SR</div>
-          <div><strong>Sari Rahmawati</strong><span>Surabaya</span></div>
+          <div class="author-avatar">FAZ</div>
+          <div><strong>Fathiryasyaa A.Z</strong><span>Surabaya</span></div>
         </div>
       </div>
       <div class="testimonial-card">
         <div class="stars">★★★★★</div>
         <p>"Restoran hotelnya benar-benar kelas dunia. Makanannya lezat dan pemandangannya indah sekali."</p>
         <div class="testimonial-author">
-          <div class="author-avatar">BW</div>
-          <div><strong>Budi Wirawan</strong><span>Bandung</span></div>
+          <div class="author-avatar">PS</div>
+          <div><strong>Prabowo Subianto</strong><span>Bandung</span></div>
         </div>
       </div>
     </div>
@@ -276,7 +250,7 @@
       <div class="footer-brand">
         <span class="logo-symbol">✦</span>
         <span class="logo-text">The Grand Azura</span>
-        <p>Jl. Sudirman No. 88, Jakarta Pusat<br/>📞 +62 21 5555-8888<br/>✉ reservasi@grandazura.com</p>
+        <p>Jl. Sudirman No. 88, Jakarta Pusat<br/>Tel. +62 21 5555-8888<br/>Kelompok5@grandazura.com</p>
       </div>
       <div class="footer-links">
         <h4>Navigasi</h4>

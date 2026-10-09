@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
@@ -32,7 +32,7 @@
 
       {% if error %}
       <div class="login-error">
-        <span>⚠️</span> {{ error }}
+        {{ error }}
       </div>
       {% endif %}
 
@@ -44,7 +44,7 @@
                  autocomplete="current-password"
                  required autofocus />
           <button type="button" class="toggle-pw" id="toggle-pw" title="Tampilkan/sembunyikan password">
-            👁
+            Tampilkan
           </button>
         </div>
       </div>
@@ -63,7 +63,7 @@
       const input = document.getElementById('password');
       const isText = input.type === 'text';
       input.type = isText ? 'password' : 'text';
-      this.textContent = isText ? '👁' : '🙈';
+      this.textContent = isText ? 'Tampilkan' : 'Sembunyikan';
     });
   </script>
 </body>

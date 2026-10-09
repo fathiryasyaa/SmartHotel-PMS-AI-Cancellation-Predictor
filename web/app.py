@@ -56,6 +56,12 @@ def get_conn():
     return pool.get_connection()
 
 
+# Stok kamar awal per tipe (kapasitas total tiap tipe kamar)
+ROOM_INITIAL_STOCK = {
+    'A': 40, 'B': 35, 'C': 30, 'D': 20, 'E': 25,
+    'F': 15, 'G': 10, 'H': 8,  'I': 4,  'L': 2,
+}
+
 def init_db():
     """Buat tabel jika belum ada."""
     conn = get_conn()
@@ -65,6 +71,7 @@ def init_db():
             id                      VARCHAR(20)    PRIMARY KEY,
             guest_name              VARCHAR(120)   NOT NULL,
             guest_email             VARCHAR(150)   NOT NULL DEFAULT '',
+            guest_phone             VARCHAR(30)    NOT NULL DEFAULT '',
             hotel                   VARCHAR(60)    NOT NULL,
             arrival_date_day_of_month TINYINT      NOT NULL,
             arrival_date_month      VARCHAR(20)    NOT NULL,
@@ -106,9 +113,22 @@ def init_db():
             delete_reason           VARCHAR(255)   NULL DEFAULT NULL
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     """)
+
+    # Buat tabel room_inventory untuk melacak ketersediaan kamar
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS room_inventory (
+            room_type       CHAR(1)     PRIMARY KEY,
+            total_rooms     SMALLINT    NOT NULL DEFAULT 0,
+            available_rooms SMALLINT    NOT NULL DEFAULT 0,
+            updated_at      DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP
+                            ON UPDATE CURRENT_TIMESTAMP
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    """)
+
     # Tambah kolom baru jika tabel sudah ada tapi belum punya kolom PMS
     alter_stmts = [
         "ALTER TABLE bookings ADD COLUMN guest_email VARCHAR(150) NOT NULL DEFAULT '' AFTER guest_name",
+        "ALTER TABLE bookings ADD COLUMN guest_phone VARCHAR(30) NOT NULL DEFAULT '' AFTER guest_email",
         "ALTER TABLE bookings ADD COLUMN pms_status VARCHAR(20) NOT NULL DEFAULT 'reserved' AFTER policy",
         "ALTER TABLE bookings ADD COLUMN checkin_at DATETIME NULL DEFAULT NULL AFTER pms_status",
         "ALTER TABLE bookings ADD COLUMN checkout_at DATETIME NULL DEFAULT NULL AFTER checkin_at",
@@ -121,6 +141,17 @@ def init_db():
             cur.execute(stmt)
         except Exception:
             pass   # kolom sudah ada, abaikan
+
+    # Seed room_inventory jika belum ada data
+    cur.execute("SELECT COUNT(*) FROM room_inventory")
+    if cur.fetchone()[0] == 0:
+        for rtype, total in ROOM_INITIAL_STOCK.items():
+            cur.execute("""
+                INSERT INTO room_inventory (room_type, total_rooms, available_rooms)
+                VALUES (%s, %s, %s)
+                ON DUPLICATE KEY UPDATE total_rooms = VALUES(total_rooms)
+            """, (rtype, total, total))
+
     conn.commit()
     cur.close()
     conn.close()
@@ -353,7 +384,19 @@ def next_booking_id() -> str:
 # ── Routes ───────────────────────────────────────────────────────────────────
 @app.route('/')
 def index():
-    return render_template('index.html')
+    total_rooms = sum(ROOM_INITIAL_STOCK.values())
+    try:
+        conn = get_conn()
+        cur  = conn.cursor()
+        cur.execute("SELECT SUM(total_rooms) FROM room_inventory")
+        row = cur.fetchone()
+        if row and row[0] is not None:
+            total_rooms = int(row[0])
+        cur.close()
+        conn.close()
+    except Exception:
+        pass
+    return render_template('index.html', total_rooms=total_rooms)
 
 
 @app.route('/booking')
@@ -394,21 +437,62 @@ def staff_logout():
     return redirect(url_for('staff_login'))
 
 
+# ── API: ketersediaan kamar (real-time) ─────────────────────────────────────
+@app.route('/api/room-availability')
+def api_room_availability():
+    conn = get_conn()
+    cur  = conn.cursor()
+    cur.execute("""
+        SELECT room_type, total_rooms, available_rooms
+        FROM room_inventory
+        ORDER BY room_type
+    """)
+    rows = cur.fetchall()
+    cur.close()
+    conn.close()
+    result = {
+        r[0]: {'total': int(r[1]), 'available': int(r[2])}
+        for r in rows
+    }
+    return jsonify(result)
+
+
 # ── API: buat reservasi ──────────────────────────────────────────────────────
 @app.route('/api/booking', methods=['POST'])
 def api_booking():
-    data   = request.get_json()
-    result = predict_cancellation(data)
-
-    booking_id = next_booking_id()
-    now        = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    data        = request.get_json()
+    room_type   = data.get('reserved_room_type', 'A').upper()
+    result      = predict_cancellation(data)
+    booking_id  = next_booking_id()
+    now         = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
     conn = get_conn()
     cur  = conn.cursor()
     try:
+        # ── Cek & kurangi stok kamar (atomic dengan SELECT FOR UPDATE) ──
+        cur.execute("""
+            SELECT available_rooms FROM room_inventory
+            WHERE room_type = %s
+            FOR UPDATE
+        """, (room_type,))
+        inv_row = cur.fetchone()
+        if not inv_row:
+            return jsonify({'error': f'Tipe kamar {room_type} tidak ditemukan'}), 400
+        if inv_row[0] <= 0:
+            return jsonify({'error': f'Kamar tipe {room_type} sudah penuh/tidak tersedia'}), 409
+
+        # Kurangi stok
+        cur.execute("""
+            UPDATE room_inventory
+            SET available_rooms = available_rooms - 1
+            WHERE room_type = %s AND available_rooms > 0
+        """, (room_type,))
+        if cur.rowcount == 0:
+            return jsonify({'error': f'Kamar tipe {room_type} baru saja habis, silakan pilih tipe lain'}), 409
+
         cur.execute("""
             INSERT INTO bookings (
-                id, guest_name, guest_email, hotel,
+                id, guest_name, guest_email, guest_phone, hotel,
                 arrival_date_day_of_month, arrival_date_month, arrival_date_year,
                 stays_in_week_nights, stays_in_weekend_nights,
                 adults, children, babies,
@@ -419,7 +503,7 @@ def api_booking():
                 probability, prediction, risk_level, risk_label, policy,
                 created_at
             ) VALUES (
-                %s,%s,%s,%s,
+                %s,%s,%s,%s,%s,
                 %s,%s,%s,
                 %s,%s,
                 %s,%s,%s,
@@ -434,6 +518,7 @@ def api_booking():
             booking_id,
             data.get('guest_name', 'Tamu'),
             data.get('guest_email', '').strip().lower(),
+            data.get('guest_phone', '').strip()[:20],
             data.get('hotel', 'City Hotel'),
             int(data.get('arrival_date_day_of_month', 1)),
             data.get('arrival_date_month', 'January'),
@@ -447,7 +532,7 @@ def api_booking():
             data.get('meal', 'BB'),
             data.get('market_segment', 'Online TA'),
             data.get('distribution_channel', 'TA/TO'),
-            data.get('reserved_room_type', 'A'),
+            room_type,
             data.get('deposit_type', 'No Deposit'),
             data.get('customer_type', 'Transient'),
             int(data.get('lead_time', 0)),
@@ -462,6 +547,9 @@ def api_booking():
             now,
         ))
         conn.commit()
+    except Exception as e:
+        conn.rollback()
+        raise e
     finally:
         cur.close()
         conn.close()
@@ -532,11 +620,14 @@ def api_delete_booking(booking_id):
     try:
         # Pastikan record ada dan belum dihapus
         cur.execute(
-            "SELECT id FROM bookings WHERE id = %s AND deleted_at IS NULL",
+            "SELECT id, reserved_room_type, pms_status FROM bookings WHERE id = %s AND deleted_at IS NULL",
             (booking_id,)
         )
-        if not cur.fetchone():
+        row = cur.fetchone()
+        if not row:
             return jsonify({'error': 'Reservasi tidak ditemukan'}), 404
+
+        _, room_type, pms_status = row
 
         # Soft delete — data tetap ada di DB, hanya ditandai
         cur.execute("""
@@ -546,7 +637,19 @@ def api_delete_booking(booking_id):
                 delete_reason = %s
             WHERE id = %s
         """, (datetime.now(), deleted_by, reason, booking_id))
+
+        # Kembalikan stok kamar jika booking masih aktif (belum cancel/checkout)
+        if pms_status not in ('canceled_guest', 'canceled_staff', 'checked_out'):
+            cur.execute("""
+                UPDATE room_inventory
+                SET available_rooms = LEAST(available_rooms + 1, total_rooms)
+                WHERE room_type = %s
+            """, (room_type,))
+
         conn.commit()
+    except Exception as e:
+        conn.rollback()
+        raise e
     finally:
         cur.close()
         conn.close()
@@ -627,7 +730,7 @@ def api_guest_cancel():
     conn = get_conn()
     cur  = conn.cursor()
     cur.execute("""
-        SELECT id, guest_name, guest_email, pms_status, deposit_type
+        SELECT id, guest_name, guest_email, pms_status, deposit_type, reserved_room_type
         FROM bookings
         WHERE id = %s AND deleted_at IS NULL
     """, (booking_id,))
@@ -637,7 +740,7 @@ def api_guest_cancel():
         cur.close(); conn.close()
         return jsonify({'error': 'Reservasi tidak ditemukan'}), 404
 
-    db_id, db_name, db_email, pms_status, deposit_type = row
+    db_id, db_name, db_email, pms_status, deposit_type, room_type = row
 
     if email != db_email.lower():
         cur.close(); conn.close()
@@ -659,6 +762,14 @@ def api_guest_cancel():
             cancel_reason = %s
         WHERE id = %s
     """, (datetime.now(), reason or 'Dibatalkan oleh tamu', booking_id))
+
+    # Kembalikan stok kamar ke inventory
+    cur.execute("""
+        UPDATE room_inventory
+        SET available_rooms = LEAST(available_rooms + 1, total_rooms)
+        WHERE room_type = %s
+    """, (room_type,))
+
     conn.commit()
     cur.close()
     conn.close()
@@ -738,7 +849,7 @@ def api_pms_update_status():
     conn = get_conn()
     cur  = conn.cursor()
     cur.execute(
-        "SELECT id, pms_status FROM bookings WHERE id = %s AND deleted_at IS NULL",
+        "SELECT id, pms_status, reserved_room_type FROM bookings WHERE id = %s AND deleted_at IS NULL",
         (booking_id,)
     )
     row = cur.fetchone()
@@ -746,7 +857,9 @@ def api_pms_update_status():
         cur.close(); conn.close()
         return jsonify({'error': 'Reservasi tidak ditemukan'}), 404
 
+    _, old_status, room_type = row
     now = datetime.now()
+
     # Set timestamp kolom yang relevan
     extra_col, extra_val = '', None
     if new_status == 'checked_in':
@@ -769,6 +882,24 @@ def api_pms_update_status():
     else:
         cur.execute("UPDATE bookings SET pms_status = %s WHERE id = %s",
                     (new_status, booking_id))
+
+    # ── Sinkronisasi stok kamar ──────────────────────────────────────────────
+    # Jika status berubah ke canceled/no_show (dari status aktif) → kembalikan stok
+    canceling = new_status in ('canceled_staff', 'no_show')
+    was_active = old_status in ('reserved', 'checked_in')
+    if canceling and was_active:
+        cur.execute("""
+            UPDATE room_inventory
+            SET available_rooms = LEAST(available_rooms + 1, total_rooms)
+            WHERE room_type = %s
+        """, (room_type,))
+    # Jika di-revert ke 'reserved' dari status cancel → kurangi stok lagi
+    elif new_status == 'reserved' and old_status in ('canceled_staff', 'canceled_guest', 'no_show'):
+        cur.execute("""
+            UPDATE room_inventory
+            SET available_rooms = GREATEST(available_rooms - 1, 0)
+            WHERE room_type = %s
+        """, (room_type,))
 
     conn.commit()
     cur.close()

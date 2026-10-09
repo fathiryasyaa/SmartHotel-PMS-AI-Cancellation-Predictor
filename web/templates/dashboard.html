@@ -19,30 +19,30 @@
     </div>
     <nav class="sidebar-nav">
       <a href="#" class="sidebar-link active" data-section="overview">
-        <span class="sidebar-icon">📊</span> Overview
+        Overview
       </a>
       <a href="#" class="sidebar-link" data-section="bookings">
-        <span class="sidebar-icon">📋</span> Semua Reservasi
+        Semua Reservasi
       </a>
       <a href="#" class="sidebar-link" data-section="high-risk">
-        <span class="sidebar-icon">⚠️</span> Risiko Tinggi
+        Risiko Tinggi
       </a>
       <a href="#" class="sidebar-link" data-section="analytics">
-        <span class="sidebar-icon">📈</span> Analitik
+        Analitik
       </a>
       <a href="#" class="sidebar-link" data-section="deleted">
-        <span class="sidebar-icon">🗑️</span> Log Terhapus
+        Log Terhapus
       </a>
       <a href="/pms" class="sidebar-link">
-        <span class="sidebar-icon">🏨</span> PMS
+        PMS
       </a>
     </nav>
     <div class="sidebar-footer">
       <a href="/" class="sidebar-link">
-        <span class="sidebar-icon">🏠</span> Kembali ke Website
+        Kembali ke Website
       </a>
       <a href="/staff/logout" class="sidebar-link" style="color:rgba(255,100,100,0.7)">
-        <span class="sidebar-icon">🚪</span> Logout
+        Logout
       </a>
     </div>
   </aside>
@@ -173,7 +173,7 @@
             <thead>
               <tr>
                 <th>ID</th>
-                <th>Tamu</th>
+                <th>Tamu & Kontak</th>
                 <th>Hotel</th>
                 <th>Tiba</th>
                 <th>Durasi</th>
@@ -212,7 +212,7 @@
     <!-- ── SECTION: LOG TERHAPUS ── -->
     <section class="dash-section" id="section-deleted">
       <div class="section-toolbar">
-        <h2>🗑️ Log Reservasi Terhapus</h2>
+        <h2>Log Reservasi Terhapus</h2>
       </div>
       <div class="alert-banner" style="border-color:#b0d8b8;background:var(--success-bg)">
         <span class="alert-icon">🔒</span>
@@ -315,17 +315,17 @@
           <h3>Panduan Kebijakan Risiko</h3>
           <div class="policy-guide-grid">
             <div class="policy-item policy-high">
-              <div class="policy-badge">🔴 &gt;70%</div>
+              <div class="policy-badge high-badge">&gt;70%</div>
               <strong>Risiko Tinggi</strong>
               <p>Wajib deposit penuh atau status Non-Refundable. Lakukan konfirmasi ulang H-7 sebelum kedatangan.</p>
             </div>
             <div class="policy-item policy-medium">
-              <div class="policy-badge">🟡 30–70%</div>
+              <div class="policy-badge medium-badge">30–70%</div>
               <strong>Risiko Sedang</strong>
               <p>Kenakan biaya pembatalan 50% jika dilakukan kurang dari 7 hari sebelum kedatangan.</p>
             </div>
             <div class="policy-item policy-low">
-              <div class="policy-badge">🟢 &lt;30%</div>
+              <div class="policy-badge low-badge">&lt;30%</div>
               <strong>Risiko Rendah</strong>
               <p>Berikan fleksibilitas pembatalan gratis untuk meningkatkan kepuasan dan loyalitas tamu.</p>
             </div>
@@ -339,7 +339,7 @@
   <!-- ── DELETE CONFIRMATION MODAL ── -->
   <div class="modal-overlay hidden" id="delete-modal">
     <div class="modal-card">
-      <div class="modal-icon">🗑️</div>
+      <div class="modal-icon"></div>
       <h3>Hapus Reservasi</h3>
       <p>Reservasi <strong id="delete-modal-id"></strong> milik <strong id="delete-modal-name"></strong> akan dihapus dari daftar aktif.</p>
       <p class="modal-note">Data tidak hilang permanen — tersimpan di Log Terhapus untuk keperluan audit.</p>

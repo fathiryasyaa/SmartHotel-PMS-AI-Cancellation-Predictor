@@ -171,3 +171,119 @@
   .pms-body { padding: 1.2rem; }
   .pms-action-grid { grid-template-columns: 1fr; }
 }
+
+/* ── RISK LABEL (pengganti emoji dot) ── */
+.risk-label {
+  display: inline-block;
+  padding: .15rem .55rem;
+  border-radius: 20px;
+  font-size: .7rem;
+  font-weight: 700;
+  letter-spacing: .03em;
+  text-transform: uppercase;
+}
+.risk-label.risk-high   { background: #fee2e2; color: #b91c1c; }
+.risk-label.risk-medium { background: #fef9c3; color: #854d0e; }
+.risk-label.risk-low    { background: #dcfce7; color: #166534; }
+
+/* ── GUEST INFO & CONTACT CELL ── */
+.guest-info-cell {
+  display: flex;
+  flex-direction: column;
+  gap: .25rem;
+  min-width: 170px;
+}
+.guest-name-title {
+  font-size: .88rem;
+  color: var(--dark);
+  font-weight: 600;
+  line-height: 1.25;
+}
+.guest-contacts-row {
+  display: flex;
+  align-items: center;
+  gap: .35rem;
+  flex-wrap: wrap;
+}
+.guest-email-row {
+  font-size: .75rem;
+}
+.contact-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .25rem;
+  padding: .15rem .45rem;
+  border-radius: 4px;
+  font-size: .74rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all .15s ease;
+}
+.contact-btn.phone {
+  background: #f0f4f8;
+  color: #1e3a5f;
+  border: 1px solid #d0dbe7;
+}
+.contact-btn.phone:hover {
+  background: #dbe7f5;
+  color: #0d233e;
+}
+.contact-btn.wa {
+  background: #e8f7ee;
+  color: #166534;
+  border: 1px solid #b7ebc7;
+  font-weight: 600;
+}
+.contact-btn.wa:hover {
+  background: #25d366;
+  color: #ffffff;
+  border-color: #25d366;
+}
+.contact-btn.email {
+  color: #555;
+  background: transparent;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.contact-btn.email:hover {
+  color: var(--gold);
+}
+.contact-empty {
+  font-size: .74rem;
+  color: var(--light-text);
+  font-style: italic;
+}
+
+/* ── MODAL CONTACT BOX ── */
+.modal-contact-box {
+  background: #fdfbf7;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: .75rem 1rem;
+  margin: .6rem 0 .9rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: .45rem;
+  text-align: left;
+}
+.mcb-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .8rem;
+  font-size: .8rem;
+}
+.mcb-label {
+  color: var(--mid);
+  font-size: .78rem;
+}
+.mcb-val {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+.mcb-actions {
+  display: inline-flex;
+  gap: .3rem;
+}

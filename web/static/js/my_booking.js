@@ -6,12 +6,12 @@ let lookupEmail    = '';   // simpan email untuk keperluan pembatalan
 
 // mapping status PMS ke label yang ditampilkan ke tamu
 const STATUS_LABELS = {
-  reserved:       { text: '🗓 Aktif',            cls: 'reserved' },
-  checked_in:     { text: '✅ Sedang Check-In',   cls: 'checked_in' },
-  checked_out:    { text: '🔵 Sudah Check-Out',   cls: 'checked_out' },
-  canceled_guest: { text: '❌ Dibatalkan',         cls: 'canceled_guest' },
-  canceled_staff: { text: '❌ Dibatalkan Staff',   cls: 'canceled_staff' },
-  no_show:        { text: '⚫ No Show',            cls: 'no_show' },
+  reserved:       { text: 'Aktif',           cls: 'reserved' },
+  checked_in:     { text: 'Sedang Check-In',  cls: 'checked_in' },
+  checked_out:    { text: 'Sudah Check-Out',  cls: 'checked_out' },
+  canceled_guest: { text: 'Dibatalkan',       cls: 'canceled_guest' },
+  canceled_staff: { text: 'Dibatalkan Staff', cls: 'canceled_staff' },
+  no_show:        { text: 'No Show',          cls: 'no_show' },
 };
 
 const MEAL_LABELS = {
@@ -98,7 +98,7 @@ function showBookingList(bookings) {
         <div class="bl-id">${b.id}</div>
         <div class="bl-name">${escHtml(b.guest_name)}</div>
         <div class="bl-sub">${b.hotel} · Tipe ${b.reserved_room_type} · ${nights} malam</div>
-        <div class="bl-date">📅 ${b.arrival_date_day_of_month} ${b.arrival_date_month} ${b.arrival_date_year}</div>
+        <div class="bl-date">${b.arrival_date_day_of_month} ${b.arrival_date_month} ${b.arrival_date_year}</div>
       </div>
       <div class="bl-card-right">
         <span class="pms-status-guest ${st.cls}">${st.text}</span>
@@ -183,11 +183,11 @@ function showDetail(b) {
     // tampilkan pesan status akhir kalau sudah tidak bisa dibatalkan
     finalStatusBox.classList.remove('hidden');
     const msgs = {
-      checked_in:     { cls: 'st-checkin',  text: '✅ Tamu sudah melakukan Check-In. Tidak bisa dibatalkan.' },
-      checked_out:    { cls: 'st-checkout', text: '🔵 Tamu sudah Check-Out. Reservasi selesai.' },
-      canceled_guest: { cls: 'st-canceled', text: '❌ Reservasi ini sudah dibatalkan sebelumnya.' },
-      canceled_staff: { cls: 'st-canceled', text: '❌ Reservasi ini dibatalkan oleh staff hotel. Hubungi kami untuk informasi lebih lanjut.' },
-      no_show:        { cls: 'st-noshow',   text: '⚫ Tamu dinyatakan No Show.' },
+      checked_in:     { cls: 'st-checkin',  text: 'Tamu sudah melakukan Check-In. Tidak bisa dibatalkan.' },
+      checked_out:    { cls: 'st-checkout', text: 'Tamu sudah Check-Out. Reservasi selesai.' },
+      canceled_guest: { cls: 'st-canceled', text: 'Reservasi ini sudah dibatalkan sebelumnya.' },
+      canceled_staff: { cls: 'st-canceled', text: 'Reservasi ini dibatalkan oleh staff hotel. Hubungi kami untuk informasi lebih lanjut.' },
+      no_show:        { cls: 'st-noshow',   text: 'Tamu dinyatakan No Show.' },
     };
     const m = msgs[b.pms_status] || { cls: '', text: b.pms_status };
     finalStatusBox.className  = `final-status-box ${m.cls}`;
@@ -241,7 +241,7 @@ function showCancelSuccess(data) {
   hideAll();
   const success = document.getElementById('cancel-success');
   success.classList.remove('hidden');
-  document.getElementById('success-id').textContent = '📌 ' + data.booking_id;
+  document.getElementById('success-id').textContent = 'No. Reservasi: ' + data.booking_id;
 
   // info deposit berbeda tergantung tipe
   const note = document.getElementById('success-deposit-note');

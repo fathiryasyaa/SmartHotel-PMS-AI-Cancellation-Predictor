@@ -72,7 +72,29 @@
         <div class="form-step active" id="step-0">
           <div class="form-card">
             <h2 class="form-card-title">Pilih Tipe Kamar</h2>
-            <p style="color:var(--mid);font-size:.88rem;margin-bottom:1.8rem">Klik kamar yang Anda inginkan. Harga belum termasuk surcharge paket makan.</p>
+
+            <!-- Pilih Hotel di sini, sebelum lihat kamar -->
+            <div class="hotel-pick-row">
+              <label class="hotel-pick-label">Pilih Hotel</label>
+              <div class="hotel-pick-group">
+                <label class="hotel-pick-card" id="hpc-city">
+                  <input type="radio" name="hotel" value="City Hotel" checked />
+                  <div class="hotel-pick-content">
+                    <strong>City Hotel</strong>
+                    <small>Pusat kota, dekat bisnis</small>
+                  </div>
+                </label>
+                <label class="hotel-pick-card" id="hpc-resort">
+                  <input type="radio" name="hotel" value="Resort Hotel" />
+                  <div class="hotel-pick-content">
+                    <strong>Resort Hotel</strong>
+                    <small>Tepi pantai, pemandangan laut</small>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <p class="room-pick-hint" id="room-pick-hint" style="color:var(--mid);font-size:.88rem;margin-bottom:1.8rem">Menampilkan pilihan kamar di <strong id="hotel-hint-name">City Hotel</strong> (Pusat Kota). Klik kamar yang Anda inginkan.</p>
 
             <div class="room-picker-grid" id="room-picker-grid">
               <!-- diisi JS -->
@@ -105,44 +127,31 @@
                 <input type="email" id="guest_email" name="guest_email"
                        placeholder="email@contoh.com" required
                        autocomplete="email" />
-                <small class="field-hint">Digunakan untuk cek & batalkan reservasi</small>
+                <small class="field-hint">Digunakan untuk konfirmasi & cek reservasi</small>
               </div>
             </div>
 
             <div class="form-row">
               <div class="form-group">
+                <label for="guest_phone">Nomor Telepon / WhatsApp <span class="req">*</span></label>
+                <input type="tel" id="guest_phone" name="guest_phone"
+                       placeholder="Misal: 081234567890" required
+                       maxlength="16"
+                       inputmode="tel"
+                       autocomplete="tel" />
+                <small class="field-hint">Maksimal 15 digit angka (agar staf hotel dapat menghubungi Anda)</small>
+              </div>
+              <div class="form-group">
                 <label for="country">Negara Asal <span class="req">*</span></label>
                 <select id="country" name="country" required>
                   {% for code, name in country_choices %}
-                  <option value="{{ code }}">{{ name }}</option>
+                  <option value="{{ code }}" {% if code == 'IDN' %}selected{% endif %}>{{ name }}</option>
                   {% endfor %}
                 </select>
               </div>
             </div>
 
-            <div class="form-row">
-              <div class="form-group">
-                <label for="hotel">Tipe Hotel <span class="req">*</span></label>
-                <div class="radio-group">
-                  <label class="radio-card">
-                    <input type="radio" name="hotel" value="City Hotel" checked />
-                    <div class="radio-content">
-                      <span class="radio-icon">🏙</span>
-                      <strong>City Hotel</strong>
-                      <small>Pusat kota, dekat bisnis</small>
-                    </div>
-                  </label>
-                  <label class="radio-card">
-                    <input type="radio" name="hotel" value="Resort Hotel" />
-                    <div class="radio-content">
-                      <span class="radio-icon">🏖</span>
-                      <strong>Resort Hotel</strong>
-                      <small>Tepi pantai, pemandangan laut</small>
-                    </div>
-                  </label>
-                </div>
-              </div>
-            </div>
+            <!-- Tipe Hotel dipilih di step 0 (hidden di sini untuk submit form) -->
 
             <div class="form-row three-col">
               <div class="form-group">
@@ -173,24 +182,12 @@
             <!-- Peringatan kapasitas -->
             <p class="capacity-warn hidden" id="capacity-warn"></p>
 
-            <div class="form-row">
-              <div class="form-group">
-                <label for="customer_type">Tipe Pelanggan</label>
-                <select id="customer_type" name="customer_type">
-                  {% for ct in customer_types %}
-                  <option value="{{ ct }}">{{ ct }}</option>
-                  {% endfor %}
-                </select>
-              </div>
-              <div class="form-group">
-                <label for="market_segment">Saluran Pemesanan</label>
-                <select id="market_segment" name="market_segment">
-                  {% for ms in market_segments %}
-                  <option value="{{ ms }}">{{ ms }}</option>
-                  {% endfor %}
-                </select>
-              </div>
-            </div>
+            <!-- customer_type dihitung otomatis dari jumlah tamu -->
+            <input type="hidden" id="customer_type" name="customer_type" value="Transient" />
+
+            <!-- Auto-set: saluran pemesanan & distribusi (tidak perlu dipilih tamu) -->
+            <input type="hidden" name="market_segment"       value="Online TA" />
+            <input type="hidden" name="distribution_channel" value="Direct" />
 
             <div class="form-nav">
               <button type="button" class="btn-back" id="back-1">← Kembali</button>
@@ -207,22 +204,34 @@
             <!-- Kamar terpilih — ringkasan -->
             <div class="selected-room-banner" id="selected-room-banner-2"></div>
 
-            <div class="form-row three-col">
-              <div class="form-group">
-                <label for="arrival_date_month">Bulan Kedatangan <span class="req">*</span></label>
-                <select id="arrival_date_month" name="arrival_date_month" required>
-                  {% for m in months %}
-                  <option value="{{ m }}">{{ m }}</option>
-                  {% endfor %}
-                </select>
+            <!-- ── DATE RANGE PICKER ── -->
+            <div class="form-group drp-wrapper" style="grid-column:1/-1">
+              <label>Tanggal Menginap <span class="req">*</span></label>
+
+              <!-- Dua input field check-in / check-out -->
+              <div class="drp-inputs" id="drp-inputs">
+                <div class="drp-field" id="drp-field-in">
+                  <span class="drp-label">Check-in</span>
+                  <span class="drp-value" id="drp-display-in">Pilih tanggal</span>
+                </div>
+                <div class="drp-separator"></div>
+                <div class="drp-field" id="drp-field-out">
+                  <span class="drp-label">Check-out</span>
+                  <span class="drp-value" id="drp-display-out">Pilih tanggal</span>
+                </div>
               </div>
-              <div class="form-group">
-                <label for="arrival_date_day_of_month">Tanggal <span class="req">*</span></label>
-                <input type="number" id="arrival_date_day_of_month" name="arrival_date_day_of_month" min="1" max="31" required />
-              </div>
-              <div class="form-group">
-                <label for="arrival_date_year">Tahun <span class="req">*</span></label>
-                <input type="number" id="arrival_date_year" name="arrival_date_year" min="2024" max="2030" required />
+
+              <!-- Summary baris bawah -->
+              <div class="drp-summary hidden" id="drp-summary"></div>
+
+              <!-- Kalender popup -->
+              <div class="drp-calendar hidden" id="drp-calendar">
+                <div class="drp-cal-header">
+                  <button type="button" class="drp-nav" id="drp-prev">&#8592;</button>
+                  <div class="drp-months" id="drp-months"></div>
+                  <button type="button" class="drp-nav" id="drp-next">&#8594;</button>
+                </div>
+                <div class="drp-cal-body" id="drp-cal-body"></div>
               </div>
             </div>
 
@@ -236,24 +245,12 @@
               </div>
             </div>
 
-            <div class="form-row">
-              <div class="form-group">
-                <label for="stays_in_week_nights">Malam Hari Kerja <span class="req">*</span></label>
-                <div class="number-input">
-                  <button type="button" class="num-btn minus" data-target="stays_in_week_nights">−</button>
-                  <input type="number" id="stays_in_week_nights" name="stays_in_week_nights" value="2" min="0" max="50" required />
-                  <button type="button" class="num-btn plus" data-target="stays_in_week_nights">+</button>
-                </div>
-              </div>
-              <div class="form-group">
-                <label for="stays_in_weekend_nights">Malam Akhir Pekan</label>
-                <div class="number-input">
-                  <button type="button" class="num-btn minus" data-target="stays_in_weekend_nights">−</button>
-                  <input type="number" id="stays_in_weekend_nights" name="stays_in_weekend_nights" value="1" min="0" max="20" />
-                  <button type="button" class="num-btn plus" data-target="stays_in_weekend_nights">+</button>
-                </div>
-              </div>
-            </div>
+            <!-- Hidden fields yang dikirim ke backend -->
+            <input type="hidden" id="arrival_date_month"        name="arrival_date_month"        value="" />
+            <input type="hidden" id="arrival_date_day_of_month" name="arrival_date_day_of_month" value="" />
+            <input type="hidden" id="arrival_date_year"         name="arrival_date_year"         value="" />
+            <input type="hidden" id="stays_in_week_nights"      name="stays_in_week_nights"      value="0" />
+            <input type="hidden" id="stays_in_weekend_nights"   name="stays_in_weekend_nights"   value="0" />
 
             <div class="form-row">
               <div class="form-group">
@@ -367,6 +364,7 @@
     </div>
   </footer>
 
+  <script src="{{ url_for('static', filename='js/datepicker.js') }}"></script>
   <script src="{{ url_for('static', filename='js/booking.js') }}"></script>
 </body>
 </html>

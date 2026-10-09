@@ -1,34 +1,297 @@
 // booking.js - logika form reservasi multi-step
 
-// daftar semua tipe kamar beserta datanya
-// maxGuests = kapasitas maksimal tamu, stock = jumlah kamar tersedia
-const ROOMS = [
-  { type:'A', name:'Standard Room',     maxGuests:2, stock:40, area:22, bed:'Twin Bed',    basePrice:950000,  img:'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=600', desc:'Kamar nyaman dengan fasilitas esensial, cocok untuk perjalanan singkat.' },
-  { type:'B', name:'Superior Room',     maxGuests:2, stock:35, area:28, bed:'Queen Bed',   basePrice:1100000, img:'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=600', desc:'Dilengkapi ruang kerja dan view kota yang menenangkan.' },
-  { type:'C', name:'Deluxe Room',       maxGuests:3, stock:30, area:32, bed:'King Bed',    basePrice:1200000, img:'https://images.unsplash.com/photo-1618773928121-c32242e63f39?w=600', desc:'Kamar luas dengan dekorasi premium dan pemandangan menakjubkan.' },
-  { type:'D', name:'Deluxe Twin',       maxGuests:3, stock:20, area:34, bed:'Twin Bed',    basePrice:1350000, img:'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=600', desc:'Ideal untuk dua tamu dengan dua tempat tidur terpisah.' },
-  { type:'E', name:'Executive Room',    maxGuests:3, stock:25, area:40, bed:'King Bed',    basePrice:1500000, img:'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?w=600', desc:'Fasilitas eksekutif lengkap dengan lounge akses dan sarapan premium.' },
-  { type:'F', name:'Junior Suite',      maxGuests:4, stock:15, area:55, bed:'King Bed',    basePrice:1800000, img:'https://images.unsplash.com/photo-1631049552240-59c37f38802b?w=600', desc:'Ruang tamu terpisah dengan balkon pribadi menghadap taman.' },
-  { type:'G', name:'Family Suite',      maxGuests:5, stock:10, area:65, bed:'King + Sofa', basePrice:2200000, img:'https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=600', desc:'Dirancang khusus untuk keluarga dengan area bermain anak tersendiri.' },
-  { type:'H', name:'Grand Suite',       maxGuests:4, stock:8,  area:80, bed:'Super King',  basePrice:2800000, img:'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=600', desc:'Kemewahan sepenuhnya dengan jacuzzi dan ruang makan privat.' },
-  { type:'I', name:'Royal Suite',       maxGuests:5, stock:4,  area:100, bed:'Super King', basePrice:3500000, img:'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=600', desc:'Penginapan kelas dunia dengan butler pribadi 24 jam.' },
-  { type:'L', name:'Presidential Suite',maxGuests:6, stock:2,  area:120, bed:'Super King', basePrice:5000000, img:'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=600', desc:'Puncak kemewahan: panorama 180°, spa privat, dan ruang konferensi.' },
-];
+// Katalog kamar disesuaikan spesifik berdasarkan lokasi & tipe hotel:
+// - City Hotel: Kamar bergaya modern perkotaan, view cakrawala kota, distrik bisnis (Tipe A, B, D, E, F, G)
+// - Resort Hotel: Kamar bernuansa resort pantai & tropis, ocean view, private jacuzzi, taman (Tipe A, C, D, E, F, G, H, L)
+const HOTEL_ROOMS = {
+  'City Hotel': [
+    {
+      type: 'A',
+      name: 'Standard City Room',
+      maxGuests: 2,
+      area: 22,
+      bed: 'Twin Bed',
+      basePrice: 950000,
+      img: 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=600',
+      desc: 'Kamar modern di pusat kota dengan fasilitas esensial, cocok untuk perjalanan dinas atau liburan singkat.'
+    },
+    {
+      type: 'B',
+      name: 'Superior City View',
+      maxGuests: 2,
+      area: 28,
+      bed: 'Queen Bed',
+      basePrice: 1100000,
+      img: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=600',
+      desc: 'Kamar elegan dengan meja kerja luas dan jendela panorama cakrawala kota metropolitan.'
+    },
+    {
+      type: 'D',
+      name: 'Deluxe Twin City',
+      maxGuests: 3,
+      area: 34,
+      bed: 'Twin Bed',
+      basePrice: 1350000,
+      img: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=600',
+      desc: 'Dua ranjang nyaman di pusat distrik bisnis kota, ideal untuk rekan kerja atau sahabat.'
+    },
+    {
+      type: 'E',
+      name: 'Executive Business Room',
+      maxGuests: 3,
+      area: 40,
+      bed: 'King Bed',
+      basePrice: 1550000,
+      img: 'https://images.unsplash.com/photo-1590490360182-c33d57733427?w=600',
+      desc: 'Akses eksklusif Executive Lounge, sarapan premium, dan ruang meeting di pusat kota.'
+    },
+    {
+      type: 'F',
+      name: 'Junior Suite City',
+      maxGuests: 4,
+      area: 55,
+      bed: 'King Bed',
+      basePrice: 1900000,
+      img: 'https://images.unsplash.com/photo-1618773928121-c32242e63f39?w=600',
+      desc: 'Suite luas berfasilitas lengkap dengan ruang duduk terpisah dan pemandangan gemerlap lampu kota malam.'
+    },
+    {
+      type: 'G',
+      name: 'Family Suite City',
+      maxGuests: 5,
+      area: 65,
+      bed: 'King + Sofa Bed',
+      basePrice: 2300000,
+      img: 'https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=600',
+      desc: 'Pilihan sempurna untuk keluarga yang ingin menjelajahi pusat perbelanjaan dan kuliner kota.'
+    }
+  ],
+  'Resort Hotel': [
+    {
+      type: 'A',
+      name: 'Standard Garden Room',
+      maxGuests: 2,
+      area: 26,
+      bed: 'Twin Bed',
+      basePrice: 1050000,
+      img: 'https://images.unsplash.com/photo-1591088398332-8a7791972843?w=600',
+      desc: 'Kamar nyaman bernuansa tropis dengan teras asri menghadap taman resort yang hijau.'
+    },
+    {
+      type: 'C',
+      name: 'Deluxe Ocean View',
+      maxGuests: 3,
+      area: 36,
+      bed: 'King Bed',
+      basePrice: 1400000,
+      img: 'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=600',
+      desc: 'Balkon privat dengan panorama laut lepas, semilir angin pantai, dan deburan ombak menenangkan.'
+    },
+    {
+      type: 'D',
+      name: 'Deluxe Twin Resort',
+      maxGuests: 3,
+      area: 38,
+      bed: 'Twin Bed',
+      basePrice: 1450000,
+      img: 'https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=600',
+      desc: 'Dua tempat tidur terpisah dengan arsitektur resort tropis santai dan akses mudah ke pantai.'
+    },
+    {
+      type: 'E',
+      name: 'Executive Ocean Suite',
+      maxGuests: 3,
+      area: 48,
+      bed: 'King Bed',
+      basePrice: 1750000,
+      img: 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=600',
+      desc: 'Suite elegan dengan pemandangan langsung matahari terbenam (sunset) di atas garis pantai.'
+    },
+    {
+      type: 'F',
+      name: 'Junior Suite Pool & Garden',
+      maxGuests: 4,
+      area: 60,
+      bed: 'King Bed',
+      basePrice: 2100000,
+      img: 'https://images.unsplash.com/photo-1631049552240-59c37f38802b?w=600',
+      desc: 'Akses dekat laguna kolam renang dengan sundeck dan beranda santai di tengah rimbunnya alam resort.'
+    },
+    {
+      type: 'G',
+      name: 'Family Beach Suite',
+      maxGuests: 5,
+      area: 72,
+      bed: 'King + Sofa Bed',
+      basePrice: 2600000,
+      img: 'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?w=600',
+      desc: 'Suite luas ramah keluarga dilengkapi area bermain anak dan akses langsung ke pasir pantai.'
+    },
+    {
+      type: 'H',
+      name: 'Grand Ocean Suite & Jacuzzi',
+      maxGuests: 4,
+      area: 85,
+      bed: 'Super King',
+      basePrice: 3200000,
+      img: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=600',
+      desc: 'Kemewahan tropis premium dengan private outdoor jacuzzi, ruang makan privat, dan butler resort.'
+    },
+    {
+      type: 'L',
+      name: 'Presidential Beachfront Villa',
+      maxGuests: 6,
+      area: 130,
+      bed: 'Super King',
+      basePrice: 5500000,
+      img: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=600',
+      desc: 'Puncak kemewahan resort: panorama laut 180°, private plunge pool, paviliun spa & gazebo eksklusif.'
+    }
+  ]
+};
+
+// Ambil tipe hotel yang sedang dipilih ('City Hotel' atau 'Resort Hotel')
+function getSelectedHotel() {
+  const radio = document.querySelector('input[name="hotel"]:checked');
+  return radio ? radio.value : 'City Hotel';
+}
+
+// Ambil daftar kamar yang tersedia untuk hotel yang sedang aktif
+function getActiveRooms() {
+  const hotel = getSelectedHotel();
+  return HOTEL_ROOMS[hotel] || HOTEL_ROOMS['City Hotel'];
+}
 
 // surcharge = biaya tambahan per paket makan (bisa negatif untuk diskon)
 const MEAL_SURCHARGE = { BB:0, HB:150000, FB:280000, SC:-80000 };
 const MEAL_LABELS    = { BB:'Bed & Breakfast', HB:'Half Board', FB:'Full Board', SC:'Self Catering' };
 
+// ── Ketersediaan kamar real-time dari server ─────────────────────────────────
+// Struktur: { 'A': { total: 40, available: 38 }, 'B': { ... }, ... }
+let roomAvailability = {};
+let availabilityLoaded = false;
+
+/**
+ * Ambil ketersediaan kamar dari server, lalu re-render kartu.
+ * Dipanggil saat load & setiap 30 detik (polling).
+ */
+async function fetchRoomAvailability() {
+  try {
+    const res  = await fetch('/api/room-availability');
+    if (!res.ok) throw new Error('Gagal memuat data ketersediaan');
+    const data = await res.json();
+    const changed = JSON.stringify(data) !== JSON.stringify(roomAvailability);
+    roomAvailability  = data;
+    availabilityLoaded = true;
+
+    // Re-render hanya jika ada perubahan stok
+    if (changed) renderRoomPicker();
+
+    // Update badge ketersediaan di kartu yang sudah di-render
+    updateAvailabilityBadges();
+
+    // Jika kamar yang dipilih ternyata sudah penuh → tampilkan peringatan
+    if (selectedRoom) {
+      const avail = roomAvailability[selectedRoom.type];
+      if (avail && avail.available === 0) {
+        showRoomSoldOutWarning(selectedRoom.type);
+      }
+    }
+  } catch (err) {
+    console.warn('Gagal fetch ketersediaan kamar:', err);
+  }
+}
+
+/** Update hanya badge stok di kartu tanpa re-render penuh */
+function updateAvailabilityBadges() {
+  getActiveRooms().forEach(r => {
+    const card  = document.querySelector(`.room-pick-card[data-type="${r.type}"]`);
+    if (!card) return;
+    const avail = roomAvailability[r.type];
+    if (!avail) return;
+    const { available, total } = avail;
+    const soldOut = available === 0;
+
+    // Perbarui badge di img-overlay
+    const imgDiv = card.querySelector('.rpc-img');
+    if (imgDiv) {
+      // Hapus badge lama
+      imgDiv.querySelectorAll('.rpc-soldout-badge, .rpc-limited-badge, .rpc-avail-badge').forEach(b => b.remove());
+      if (soldOut) {
+        imgDiv.insertAdjacentHTML('beforeend', '<div class="rpc-soldout-badge">Penuh</div>');
+      } else if (available <= 5) {
+        imgDiv.insertAdjacentHTML('beforeend', `<div class="rpc-limited-badge">Sisa ${available} kamar</div>`);
+      } else {
+        imgDiv.insertAdjacentHTML('beforeend', `<div class="rpc-avail-badge">Tersedia ${available}/${total}</div>`);
+      }
+    }
+
+    // Perbarui status card (sold-out class & click)
+    card.classList.toggle('sold-out', soldOut);
+    card.setAttribute('tabindex', soldOut ? '-1' : '0');
+    if (soldOut) {
+      card.setAttribute('onclick', '');
+      card.setAttribute('onkeydown', '');
+    } else {
+      card.setAttribute('onclick', `selectRoom('${r.type}')`);
+      card.setAttribute('onkeydown', `if(event.key==='Enter')selectRoom('${r.type}')`);
+    }
+
+    // Update indikator bawah kartu
+    const indicator = card.querySelector('.rpc-select-indicator');
+    if (indicator && !card.classList.contains('selected')) {
+      indicator.textContent = soldOut ? 'Penuh' : 'Pilih Kamar';
+    }
+  });
+}
+
+/** Tampilkan peringatan bahwa kamar yang dipilih kini sudah penuh */
+function showRoomSoldOutWarning(type) {
+  const errEl = document.getElementById('room-pick-error');
+  if (errEl) {
+    errEl.textContent = `Kamar Tipe ${type} baru saja penuh! Silakan pilih tipe lain.`;
+    errEl.classList.remove('hidden');
+  }
+}
+
 let selectedRoom = null; // kamar yang sedang dipilih user
 
-// render semua kartu pilihan kamar ke dalam grid
+// render semua kartu pilihan kamar ke dalam grid sesuai hotel aktif
 function renderRoomPicker(preselect) {
   const grid = document.getElementById('room-picker-grid');
   if (!grid) return;
 
-  grid.innerHTML = ROOMS.map(r => {
-    const soldOut = r.stock === 0;
-    const sel     = selectedRoom?.type === r.type;
+  const currentHotel = getSelectedHotel();
+  const rooms = getActiveRooms();
+
+  // Update teks petunjuk kontekstual filter hotel
+  const hintDesc = document.getElementById('room-pick-hint');
+  if (hintDesc) {
+    hintDesc.innerHTML = currentHotel === 'City Hotel'
+      ? `Menampilkan pilihan kamar di <strong>City Hotel</strong> (Pusat Kota & Bisnis). Klik kamar yang Anda inginkan.`
+      : `Menampilkan pilihan kamar di <strong>Resort Hotel</strong> (Tepi Pantai & Tropis). Klik kamar yang Anda inginkan.`;
+  }
+
+  grid.innerHTML = rooms.map(r => {
+    // Ambil stok dari server jika sudah tersedia, fallback ke unknown
+    const inv       = roomAvailability[r.type];
+    const available = inv ? inv.available : null;
+    const total     = inv ? inv.total     : null;
+    const soldOut   = inv ? available === 0 : false;
+    const sel       = selectedRoom?.type === r.type;
+
+    // Badge ketersediaan
+    let badgeHtml = '';
+    if (!inv) {
+      badgeHtml = '<div class="rpc-loading-badge">Memuat...</div>';
+    } else if (soldOut) {
+      badgeHtml = '<div class="rpc-soldout-badge">Penuh</div>';
+    } else if (available <= 5) {
+      badgeHtml = `<div class="rpc-limited-badge">Sisa ${available} kamar</div>`;
+    } else {
+      badgeHtml = `<div class="rpc-avail-badge">Tersedia ${available}/${total}</div>`;
+    }
+
     return `
     <div class="room-pick-card ${sel ? 'selected' : ''} ${soldOut ? 'sold-out' : ''}"
          data-type="${r.type}" role="button" tabindex="${soldOut ? -1 : 0}"
@@ -36,8 +299,7 @@ function renderRoomPicker(preselect) {
          onclick="${soldOut ? '' : `selectRoom('${r.type}')`}"
          onkeydown="if(event.key==='Enter')selectRoom('${r.type}')">
       <div class="rpc-img" style="background-image:url('${r.img}')">
-        ${soldOut ? '<div class="rpc-soldout-badge">Penuh</div>' : ''}
-        ${r.stock <= 5 && !soldOut ? `<div class="rpc-limited-badge">Sisa ${r.stock} kamar</div>` : ''}
+        ${badgeHtml}
       </div>
       <div class="rpc-body">
         <div class="rpc-header">
@@ -47,12 +309,12 @@ function renderRoomPicker(preselect) {
         <h3 class="rpc-name">${r.name}</h3>
         <p class="rpc-desc">${r.desc}</p>
         <div class="rpc-features">
-          <span>👥 Maks. ${r.maxGuests} tamu</span>
-          <span>📐 ${r.area} m²</span>
-          <span>🛏 ${r.bed}</span>
+          <span>Maks. ${r.maxGuests} tamu</span>
+          <span>${r.area} m²</span>
+          <span>${r.bed}</span>
         </div>
         <div class="rpc-select-indicator">
-          ${sel ? '✅ Dipilih' : (soldOut ? '❌ Penuh' : 'Pilih Kamar')}
+          ${sel ? 'Dipilih' : (soldOut ? 'Penuh' : 'Pilih Kamar')}
         </div>
       </div>
     </div>`;
@@ -64,35 +326,83 @@ function renderRoomPicker(preselect) {
 
 // pilih kamar berdasarkan tipe, update tampilan semua kartu
 function selectRoom(type, scroll = true) {
-  selectedRoom = ROOMS.find(r => r.type === type) || null;
+  const rooms = getActiveRooms();
+  selectedRoom = rooms.find(r => r.type === type) || null;
   if (!selectedRoom) return;
 
   document.querySelectorAll('.room-pick-card').forEach(card => {
     const isSelected = card.dataset.type === type;
     card.classList.toggle('selected', isSelected);
     card.setAttribute('aria-pressed', isSelected);
-    card.querySelector('.rpc-select-indicator').textContent = isSelected ? '✅ Dipilih' : 'Pilih Kamar';
+    card.querySelector('.rpc-select-indicator').textContent = isSelected ? 'Dipilih' : 'Pilih Kamar';
   });
 
   document.getElementById('room-pick-error')?.classList.add('hidden');
   updateSelectedRoomBanners();
   updateAdrDisplay();
 
-  // scroll ke kartu yang dipilih
+  // Kirim event agar datepicker.js bisa memperbarui harga di kalender
+  document.dispatchEvent(new CustomEvent('roomSelected', {
+    detail: { basePrice: selectedRoom.basePrice }
+  }));
+  // Update harga via DRP API jika tersedia
+  if (window.DRP) DRP.setBasePrice(selectedRoom.basePrice);
+
   if (scroll) {
     const card = document.querySelector(`.room-pick-card[data-type="${type}"]`);
     card?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 }
 
+// Handler saat pilihan hotel diganti oleh user
+function onHotelChange() {
+  const rooms = getActiveRooms();
+
+  // Sinkronkan styling radio card hotel (.active)
+  document.querySelectorAll('.hotel-pick-card').forEach(card => {
+    const inp = card.querySelector('input[name="hotel"]');
+    card.classList.toggle('active', inp?.checked);
+  });
+
+  // Jika sudah ada kamar terpilih sebelumnya:
+  if (selectedRoom) {
+    const match = rooms.find(r => r.type === selectedRoom.type);
+    if (match) {
+      // Tipe kamar sama tersedia di hotel baru (misal Tipe A, D, E, F, G)
+      // Perbarui objek ke data versi hotel yang baru
+      selectedRoom = match;
+    } else {
+      // Tipe kamar tidak tersedia di hotel baru (misal Tipe B di Resort, atau C/H/L di City)
+      // Otomatis pilih kamar pertama di hotel yang baru (Tipe A)
+      selectedRoom = rooms[0] || null;
+    }
+  } else {
+    // Belum ada kamar terpilih, pilih kamar pertama sebagai default
+    selectedRoom = rooms[0] || null;
+  }
+
+  // Re-render pilihan kamar untuk hotel terpilih
+  renderRoomPicker();
+  updateAvailabilityBadges();
+  updateSelectedRoomBanners();
+  updateAdrDisplay();
+
+  if (selectedRoom) {
+    document.dispatchEvent(new CustomEvent('roomSelected', {
+      detail: { basePrice: selectedRoom.basePrice }
+    }));
+    if (window.DRP) DRP.setBasePrice(selectedRoom.basePrice);
+  }
+}
+
 // update banner ringkasan kamar di step 1 dan step 2
 function updateSelectedRoomBanners() {
+  const hotel = getSelectedHotel();
   const html = selectedRoom
     ? `<div class="srb-inner">
-        <span class="srb-icon">🛏</span>
         <div>
-          <strong>Tipe ${selectedRoom.type} — ${selectedRoom.name}</strong>
-          <span>Maks. ${selectedRoom.maxGuests} tamu · ${selectedRoom.area} m² · ${selectedRoom.bed}</span>
+          <strong>${hotel} &middot; Tipe ${selectedRoom.type} — ${selectedRoom.name}</strong>
+          <span>Maks. ${selectedRoom.maxGuests} tamu &middot; ${selectedRoom.area} m² &middot; ${selectedRoom.bed}</span>
         </div>
         <button type="button" class="srb-change" onclick="goToStep(0)">Ganti Kamar</button>
        </div>`
@@ -143,6 +453,21 @@ document.getElementById('back-1')?.addEventListener('click', () => goToStep(0));
 document.getElementById('back-2')?.addEventListener('click', () => goToStep(1));
 document.getElementById('back-3')?.addEventListener('click', () => goToStep(2));
 
+// auto-derive customer_type dari jumlah tamu
+function autoCustomerType() {
+  const adults   = parseInt(document.getElementById('adults')?.value)   || 0;
+  const children = parseInt(document.getElementById('children')?.value) || 0;
+  const babies   = parseInt(document.getElementById('babies')?.value)   || 0;
+  const hidden   = document.getElementById('customer_type');
+  if (!hidden) return;
+
+  let type = 'Transient';
+  if (adults >= 4)           type = 'Group';
+  else if (children + babies > 0) type = 'Transient-Party';
+
+  hidden.value = type;
+}
+
 // tombol +/- untuk input angka (jumlah tamu, malam, dll)
 document.querySelectorAll('.num-btn').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -155,7 +480,10 @@ document.querySelectorAll('.num-btn').forEach(btn => {
     if (btn.classList.contains('minus')) val = Math.max(val - 1, min);
     input.value = val;
     if (['stays_in_week_nights','stays_in_weekend_nights'].includes(btn.dataset.target)) updateTotal();
-    if (['adults','children','babies'].includes(btn.dataset.target)) checkCapacity();
+    if (['adults','children','babies'].includes(btn.dataset.target)) {
+      checkCapacity();
+      autoCustomerType();
+    }
   });
 });
 
@@ -169,14 +497,14 @@ function checkCapacity() {
   if (total > selectedRoom.maxGuests) {
     warnEl?.classList.remove('hidden');
     if (warnEl) warnEl.textContent =
-      `⚠️ Tipe ${selectedRoom.type} (${selectedRoom.name}) hanya menampung maksimal ${selectedRoom.maxGuests} tamu. Kurangi jumlah tamu atau pilih kamar yang lebih besar.`;
+      `Tipe ${selectedRoom.type} (${selectedRoom.name}) hanya menampung maksimal ${selectedRoom.maxGuests} tamu. Kurangi jumlah tamu atau pilih kamar yang lebih besar.`;
     return false;
   }
   warnEl?.classList.add('hidden');
   return true;
 }
 
-// validasi step 1 (nama & email tamu)
+// validasi step 1 (nama, email & nomor telepon tamu)
 function validateStep1() {
   const name = document.getElementById('guest_name').value.trim();
   if (!name) { showFieldError('guest_name', 'Nama lengkap wajib diisi'); return false; }
@@ -188,36 +516,56 @@ function validateStep1() {
   if (!emailRegex.test(email))   { showFieldError('guest_email', 'Format email tidak valid'); return false; }
   clearFieldError('guest_email');
 
+  const phone = document.getElementById('guest_phone')?.value.trim() || '';
+  if (!phone) { showFieldError('guest_phone', 'Nomor telepon/WhatsApp wajib diisi'); return false; }
+  const phoneDigits = phone.replace(/\D/g, '');
+  if (phoneDigits.length < 8) { showFieldError('guest_phone', 'Nomor telepon minimal 8 digit angka'); return false; }
+  if (phoneDigits.length > 15) { showFieldError('guest_phone', 'Nomor telepon maksimal 15 digit angka'); return false; }
+  clearFieldError('guest_phone');
+
   if (!checkCapacity()) return false;
   return true;
 }
 
-// validasi step 2 (tanggal & durasi menginap)
+// validasi step 2 (tanggal menginap via date range picker)
 function validateStep2() {
-  // 1. tanggal harus valid
-  if (!dateState.valid) {
-    showDateError(dateState.errorMsg);
+  // 1. pastikan tanggal sudah dipilih via DRP
+  if (!window.DRP || !DRP.isComplete()) {
+    const inp = document.getElementById('drp-inputs');
+    if (inp) {
+      inp.style.borderColor = 'var(--danger)';
+      let err = inp.parentElement?.querySelector('.drp-error');
+      if (!err) {
+        err = document.createElement('span');
+        err.className = 'drp-error field-error';
+        err.style.cssText = 'color:var(--danger);font-size:.75rem;margin-top:.4rem;display:block;';
+        inp.parentElement.appendChild(err);
+      }
+      err.textContent = 'Pilih tanggal check-in dan check-out terlebih dahulu.';
+    }
     return false;
   }
+  // reset error
+  const inp = document.getElementById('drp-inputs');
+  if (inp) inp.style.borderColor = '';
+  document.querySelector('.drp-error')?.remove();
 
   // 2. kalau kedatangan hari ini, wajib isi jam check-in
   if (dateState.isToday) {
     const timeInput = document.getElementById('checkin_hour');
     const timeVal   = timeInput?.value;
     if (!timeVal) {
-      showDateError('⚠️ Masukkan jam check-in untuk kedatangan hari ini.');
+      showDateError('Masukkan jam check-in untuk kedatangan hari ini.');
       timeInput?.focus();
       return false;
     }
-    // jam check-in harus setelah jam sekarang
     const [hh, mm] = timeVal.split(':').map(Number);
     const now       = new Date();
     const checkinMs = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hh, mm).getTime();
-    const nowMs     = now.getTime();
-    if (checkinMs <= nowMs) {
+    if (checkinMs <= now.getTime()) {
       const nowHH = String(now.getHours()).padStart(2,'0');
       const nowMM = String(now.getMinutes()).padStart(2,'0');
-      showDateError(`⚠️ Jam check-in sudah terlewat. Masukkan jam setelah ${nowHH}:${nowMM} (jam saat ini).`);
+      showDateError(`Jam check-in sudah terlewat. Masukkan jam setelah ${nowHH}:${nowMM} (jam saat ini).`);
       timeInput?.focus();
       return false;
     }
@@ -228,10 +576,9 @@ function validateStep2() {
   const wk = parseInt(document.getElementById('stays_in_week_nights').value) || 0;
   const we = parseInt(document.getElementById('stays_in_weekend_nights').value) || 0;
   if (wk + we < 1) {
-    showNumberInputError('stays_in_week_nights', 'Total malam minimal 1');
+    showDateError('Pilih minimal 1 malam menginap.');
     return false;
   }
-  clearNumberInputError('stays_in_week_nights');
   return true;
 }
 
@@ -331,20 +678,8 @@ const MONTHS_LIST = ['January','February','March','April','May','June',
 // state validasi tanggal, digunakan oleh validateStep2()
 let dateState = { valid: true, isToday: false, errorMsg: '' };
 
-// isi default tanggal kedatangan = hari ini
-function setDefaultArrivalDate() {
-  const now       = new Date();
-  const monthSel  = document.getElementById('arrival_date_month');
-  const dayInput  = document.getElementById('arrival_date_day_of_month');
-  const yearInput = document.getElementById('arrival_date_year');
-  if (monthSel)  monthSel.value  = MONTHS_LIST[now.getMonth()];
-  if (dayInput)  dayInput.value  = now.getDate();
-  if (yearInput) {
-    yearInput.value = now.getFullYear();
-    yearInput.min   = now.getFullYear(); // tahun tidak boleh kurang dari sekarang
-  }
-}
 
+// hitung lead time dari tanggal check-in yang dipilih DRP
 // hitung lead time (selisih hari dari hari ini ke tanggal kedatangan)
 function updateLeadTime() {
   const day      = parseInt(document.getElementById('arrival_date_day_of_month')?.value) || 1;
@@ -367,7 +702,7 @@ function updateLeadTime() {
 
   if (diffDays < 0) {
     // tanggal sudah lewat
-    dateState = { valid: false, isToday: false, errorMsg: '⚠️ Tanggal sudah lewat. Pilih tanggal hari ini atau yang akan datang.' };
+    dateState = { valid: false, isToday: false, errorMsg: 'Tanggal sudah lewat. Pilih tanggal hari ini atau yang akan datang.' };
     if (amountEl) { amountEl.textContent = '—'; amountEl.style.color = 'var(--danger)'; }
     if (noteEl)   { noteEl.textContent = dateState.errorMsg; noteEl.style.color = 'var(--danger)'; }
     if (hiddenEl) hiddenEl.value = 0;
@@ -398,11 +733,9 @@ function updateLeadTime() {
   }
 }
 
-// pasang event listener ke semua field tanggal
-['arrival_date_day_of_month', 'arrival_date_month', 'arrival_date_year'].forEach(id => {
-  document.getElementById(id)?.addEventListener('change', updateLeadTime);
-  document.getElementById(id)?.addEventListener('input',  updateLeadTime);
-});
+// pasang event listener: ketika DRP selesai (check-in + check-out dipilih), update lead time
+document.addEventListener('drp:changed', updateLeadTime);
+
 
 // hitung total biaya (harga per malam * jumlah malam)
 function updateTotal() {
@@ -422,6 +755,7 @@ function buildSummary() {
   const items = [
     { label:'Nama Tamu',   value: data.guest_name },
     { label:'Email',       value: data.guest_email || '—' },
+    { label:'Telepon/WA',  value: data.guest_phone || '—' },
     { label:'Hotel',       value: data.hotel },
     { label:'Kamar',       value: selectedRoom ? `Tipe ${selectedRoom.type} — ${selectedRoom.name}` : '—' },
     { label:'Kapasitas',   value: selectedRoom ? `Maks. ${selectedRoom.maxGuests} tamu` : '—' },
@@ -462,15 +796,47 @@ document.getElementById('booking-form')?.addEventListener('submit', async (e) =>
   btn.disabled = true; txt.textContent = 'Memproses...'; spin.classList.remove('hidden');
 
   try {
+    // Cek ketersediaan terkini sebelum submit
+    await fetchRoomAvailability();
+    if (selectedRoom) {
+      const inv = roomAvailability[selectedRoom.type];
+      if (inv && inv.available === 0) {
+        showRoomSoldOutWarning(selectedRoom.type);
+        goToStep(0); // kembalikan ke pemilihan kamar
+        btn.disabled = false;
+        txt.textContent = 'Konfirmasi Reservasi';
+        spin.classList.add('hidden');
+        return;
+      }
+    }
+
     const data = collectFormData();
     const res  = await fetch('/api/booking', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify(data)
     });
-    if (!res.ok) throw new Error('Server error');
-    showResult(await res.json(), data);
-  } catch {
+    const resJson = await res.json();
+    if (!res.ok) {
+      // Tangani error dari server (misalnya kamar penuh)
+      alert(resJson.error || 'Terjadi kesalahan. Silakan coba lagi.');
+      if (res.status === 409) {
+        // Kamar habis → refresh ketersediaan & kembali ke step 0
+        await fetchRoomAvailability();
+        goToStep(0);
+      }
+      return;
+    }
+    // Update stok lokal setelah booking sukses
+    if (roomAvailability[selectedRoom?.type]) {
+      roomAvailability[selectedRoom.type].available = Math.max(
+        0, roomAvailability[selectedRoom.type].available - 1
+      );
+      updateAvailabilityBadges();
+    }
+    showResult(resJson, data);
+  } catch (err) {
+    console.error(err);
     alert('Terjadi kesalahan. Silakan coba lagi.');
   } finally {
     btn.disabled = false; txt.textContent = 'Konfirmasi Reservasi'; spin.classList.add('hidden');
@@ -479,8 +845,8 @@ document.getElementById('booking-form')?.addEventListener('submit', async (e) =>
 
 // tampilkan overlay hasil reservasi beserta info risiko dari AI
 function showResult(result, data) {
-  const riskIcons  = { high:'⚠️', medium:'🔔', low:'✅' };
-  const riskTitles = { high:'Reservasi Diterima dengan Catatan', medium:'Reservasi Berhasil!', low:'Reservasi Berhasil!' };
+  const riskIcons  = { high:'!', medium:'', low:'' };
+  const riskTitles = { high:'Reservasi Diterima dengan Catatan', medium:'Reservasi Berhasil', low:'Reservasi Berhasil' };
   const riskDescs  = {
     high:   `Selamat datang, ${data.guest_name}! Reservasi Anda diterima. Tim kami akan menghubungi Anda terkait ketentuan deposit.`,
     medium: `Terima kasih, ${data.guest_name}! Reservasi Anda berhasil. Perhatikan kebijakan pembatalan yang berlaku.`,
@@ -490,7 +856,7 @@ function showResult(result, data) {
   document.getElementById('result-icon').textContent       = riskIcons[result.risk_level];
   document.getElementById('result-title').textContent      = riskTitles[result.risk_level];
   document.getElementById('result-desc').textContent       = riskDescs[result.risk_level];
-  document.getElementById('result-booking-id').textContent = '📌 ' + result.booking_id;
+  document.getElementById('result-booking-id').textContent = 'No. Reservasi: ' + result.booking_id;
 
   // info kebijakan dan probabilitas AI hanya untuk staff dashboard, tidak ditampilkan ke tamu
   const pb = document.getElementById('result-policy-box');
@@ -500,11 +866,78 @@ function showResult(result, data) {
 }
 
 // inisialisasi saat halaman selesai dimuat
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   const params    = new URLSearchParams(window.location.search);
-  const preselect = params.get('room')?.toUpperCase(); // ambil preselect dari URL jika ada
+  const preHotel  = params.get('hotel');
+  const preselect = params.get('room')?.toUpperCase();
+
+  // Pasang event listener untuk pilihan hotel
+  document.querySelectorAll('input[name="hotel"]').forEach(radio => {
+    radio.addEventListener('change', onHotelChange);
+  });
+
+  // Tentukan hotel aktif dari URL jika ada
+  if (preHotel) {
+    const r = document.querySelector(`input[name="hotel"][value="${preHotel}"]`);
+    if (r) r.checked = true;
+  } else if (preselect) {
+    // Jika kamar yang di-preselect adalah kamar khusus Resort (C, H, L), aktifkan Resort Hotel
+    if (['C', 'H', 'L'].includes(preselect)) {
+      const r = document.querySelector('input[name="hotel"][value="Resort Hotel"]');
+      if (r) r.checked = true;
+    } else if (preselect === 'B') {
+      const r = document.querySelector('input[name="hotel"][value="City Hotel"]');
+      if (r) r.checked = true;
+    }
+  }
+
+  // Sinkronkan styling visual card hotel
+  document.querySelectorAll('.hotel-pick-card').forEach(card => {
+    const inp = card.querySelector('input[name="hotel"]');
+    card.classList.toggle('active', inp?.checked);
+  });
+
+  // Render dulu daftar kamar sesuai hotel yang aktif
   renderRoomPicker(preselect);
   updateAdrDisplay();
-  setDefaultArrivalDate();
-  updateLeadTime();
+
+  // Fetch ketersediaan kamar real-time
+  await fetchRoomAvailability();
+
+  // Polling setiap 30 detik agar selalu up-to-date
+  setInterval(fetchRoomAvailability, 30_000);
+
+  // Format & batasi input nomor telepon secara real-time
+  const phoneInp = document.getElementById('guest_phone');
+  if (phoneInp) {
+    phoneInp.addEventListener('input', (e) => {
+      let val = e.target.value;
+      const startsWithPlus = val.startsWith('+');
+      // Hanya perbolehkan angka (pertahankan + jika di awal)
+      let digits = val.replace(/\D/g, '');
+      // Batasi maksimal 15 digit angka (standar internasional E.164)
+      if (digits.length > 15) {
+        digits = digits.slice(0, 15);
+      }
+      e.target.value = (startsWithPlus ? '+' : '') + digits;
+
+      // Hapus pesan error jika panjang sudah valid
+      if (digits.length >= 8 && digits.length <= 15) {
+        clearFieldError('guest_phone');
+      }
+    });
+
+    phoneInp.addEventListener('blur', () => {
+      const val = phoneInp.value.trim();
+      if (!val) return;
+      const digits = val.replace(/\D/g, '');
+      if (digits.length < 8) {
+        showFieldError('guest_phone', 'Nomor telepon minimal 8 digit angka');
+      } else if (digits.length > 15) {
+        showFieldError('guest_phone', 'Nomor telepon maksimal 15 digit angka');
+      } else {
+        clearFieldError('guest_phone');
+      }
+    });
+  }
 });

@@ -1,4 +1,4 @@
-﻿// pms.js - logika halaman Property Management System (PMS)
+// pms.js - logika halaman Property Management System (PMS)
 
 let allPmsBookings = [];  // semua data booking dari API
 let activeStatus   = '';  // filter status yang aktif saat ini
@@ -6,12 +6,12 @@ let pendingAction  = null; // aksi yang menunggu konfirmasi { bookingId, newStat
 
 // label dan class untuk tiap status PMS
 const STATUS_META = {
-  reserved:       { label: '🗓 Reservasi',        cls: 'reserved' },
-  checked_in:     { label: '✅ Check-In',          cls: 'checked_in' },
-  checked_out:    { label: '🔵 Check-Out',         cls: 'checked_out' },
-  canceled_guest: { label: '❌ Batal (Tamu)',       cls: 'canceled_guest' },
-  canceled_staff: { label: '❌ Batal (Staff)',      cls: 'canceled_staff' },
-  no_show:        { label: '⚫ No Show',            cls: 'no_show' },
+  reserved:       { label: 'Reservasi',      cls: 'reserved' },
+  checked_in:     { label: 'Check-In',       cls: 'checked_in' },
+  checked_out:    { label: 'Check-Out',      cls: 'checked_out' },
+  canceled_guest: { label: 'Batal (Tamu)',   cls: 'canceled_guest' },
+  canceled_staff: { label: 'Batal (Staff)',  cls: 'canceled_staff' },
+  no_show:        { label: 'No Show',        cls: 'no_show' },
 };
 
 // transisi status yang diperbolehkan (misalnya reserved bisa ke checked_in, tapi checked_out tidak bisa ke mana-mana)
@@ -72,12 +72,14 @@ function renderTable(bookings) {
   const tbody = document.getElementById('pms-tbody');
   if (!tbody) return;
 
-  // filter lokal berdasarkan pencarian
-  const q = (document.getElementById('pms-search')?.value || '').toLowerCase();
+  // filter lokal berdasarkan pencarian (nama, ID, telepon, email)
+  const q = (document.getElementById('pms-search')?.value || '').toLowerCase().trim();
   const filtered = q
     ? bookings.filter(b =>
-        b.id.toLowerCase().includes(q) ||
-        b.guest_name.toLowerCase().includes(q))
+        (b.id || '').toLowerCase().includes(q) ||
+        (b.guest_name || '').toLowerCase().includes(q) ||
+        (b.guest_phone || '').toLowerCase().includes(q) ||
+        (b.guest_email || '').toLowerCase().includes(q))
     : bookings;
 
   if (!filtered.length) {
@@ -89,17 +91,41 @@ function renderTable(bookings) {
     const st     = STATUS_META[b.pms_status] || { label: b.pms_status, cls: '' };
     const nights = (parseInt(b.stays_in_week_nights) || 0) + (parseInt(b.stays_in_weekend_nights) || 0);
     const canAct = ALLOWED_TRANSITIONS[b.pms_status]?.length > 0; // apakah ada aksi yang bisa dilakukan
-    const riskDot = { high: '🔴', medium: '🟡', low: '🟢' }[b.risk_level] || '';
+    const riskDot = { high: 'Tinggi', medium: 'Sedang', low: 'Rendah' }[b.risk_level] || '';
+    const riskCls = b.risk_level || '';
+
+    // Bersihkan format nomor untuk WhatsApp
+    const phoneDigits = (b.guest_phone || '').replace(/\D/g, '');
+    let waUrl = '';
+    if (phoneDigits) {
+      const waPrefix = phoneDigits.startsWith('0') ? '62' + phoneDigits.slice(1) : phoneDigits;
+      waUrl = `https://wa.me/${waPrefix}?text=${encodeURIComponent(`Halo ${b.guest_name}, kami dari The Grand Azura Hotel terkait reservasi ${b.id}.`)}`;
+    }
 
     return `
       <tr>
         <td><strong>${b.id}</strong></td>
-        <td>${escHtml(b.guest_name)}</td>
+        <td>
+          <div class="guest-info-cell">
+            <strong class="guest-name-title">${escHtml(b.guest_name)}</strong>
+            <div class="guest-contacts-row">
+              ${b.guest_phone
+                ? `<a href="tel:${escHtml(b.guest_phone)}" class="contact-btn phone" title="Hubungi via Telepon">${escHtml(b.guest_phone)}</a>
+                   ${waUrl ? `<a href="${waUrl}" target="_blank" rel="noopener" class="contact-btn wa" title="Hubungi via WhatsApp">WhatsApp</a>` : ''}`
+                : `<span class="contact-empty">Telp: —</span>`
+              }
+            </div>
+            ${b.guest_email
+              ? `<div class="guest-email-row"><a href="mailto:${escHtml(b.guest_email)}" class="contact-btn email" title="Kirim Email">${escHtml(b.guest_email)}</a></div>`
+              : ''
+            }
+          </div>
+        </td>
         <td>${escHtml(b.hotel)}</td>
         <td>${b.arrival_date_day_of_month} ${b.arrival_date_month} ${b.arrival_date_year}</td>
         <td>${nights} malam</td>
         <td>Tipe ${b.reserved_room_type}</td>
-        <td>${riskDot} <span style="font-size:.78rem">${b.probability}%</span></td>
+        <td><span class="risk-label risk-${riskCls}">${riskDot}</span> <span style="font-size:.78rem">${b.probability}%</span></td>
         <td><span class="pms-status-badge ${st.cls}">${st.label}</span></td>
         <td>
           ${canAct
@@ -141,6 +167,41 @@ function openPmsModal(bookingId) {
   document.getElementById('pms-modal-error').classList.add('hidden');
   document.getElementById('pms-note').value = '';
 
+  // Render info kontak tamu di dalam modal
+  const contactEl = document.getElementById('pms-modal-contact');
+  if (contactEl) {
+    const phoneDigits = (booking.guest_phone || '').replace(/\D/g, '');
+    const waPrefix = phoneDigits.startsWith('0') ? '62' + phoneDigits.slice(1) : phoneDigits;
+    const waUrl = phoneDigits ? `https://wa.me/${waPrefix}?text=${encodeURIComponent(`Halo ${booking.guest_name}, kami dari The Grand Azura Hotel terkait reservasi ${booking.id}.`)}` : '';
+
+    contactEl.innerHTML = `
+      <div class="modal-contact-box">
+        <div class="mcb-item">
+          <span class="mcb-label">Kontak Telepon:</span>
+          <span class="mcb-val">
+            ${booking.guest_phone
+              ? `<strong>${escHtml(booking.guest_phone)}</strong>
+                 <div class="mcb-actions">
+                   <a href="tel:${escHtml(booking.guest_phone)}" class="contact-btn phone">Telepon</a>
+                   ${waUrl ? `<a href="${waUrl}" target="_blank" rel="noopener" class="contact-btn wa">WhatsApp</a>` : ''}
+                 </div>`
+              : '<span class="contact-empty">Belum ada nomor</span>'
+            }
+          </span>
+        </div>
+        <div class="mcb-item">
+          <span class="mcb-label">Email:</span>
+          <span class="mcb-val">
+            ${booking.guest_email
+              ? `<a href="mailto:${escHtml(booking.guest_email)}" class="contact-btn email">${escHtml(booking.guest_email)}</a>`
+              : '<span class="contact-empty">Belum ada email</span>'
+            }
+          </span>
+        </div>
+      </div>
+    `;
+  }
+
   // tampilkan status saat ini
   const curSt = STATUS_META[booking.pms_status] || { label: booking.pms_status, cls: '' };
   const curEl = document.getElementById('pms-modal-current');
@@ -150,18 +211,17 @@ function openPmsModal(bookingId) {
   // render tombol aksi berdasarkan transisi yang diperbolehkan
   const allowed    = ALLOWED_TRANSITIONS[booking.pms_status] || [];
   const actionMeta = {
-    checked_in:     { emoji: '✅', label: 'Check-In',          cls: 'btn-checkin' },
-    checked_out:    { emoji: '🔵', label: 'Check-Out',         cls: 'btn-checkout' },
-    canceled_staff: { emoji: '❌', label: 'Batalkan (Staff)',   cls: 'btn-cancel' },
-    no_show:        { emoji: '⚫', label: 'Tandai No Show',     cls: 'btn-noshow' },
-    reserved:       { emoji: '🗓', label: 'Reset ke Reservasi', cls: 'btn-reset' },
+    checked_in:     { label: 'Check-In',          cls: 'btn-checkin' },
+    checked_out:    { label: 'Check-Out',          cls: 'btn-checkout' },
+    canceled_staff: { label: 'Batalkan (Staff)',   cls: 'btn-cancel' },
+    no_show:        { label: 'Tandai No Show',     cls: 'btn-noshow' },
+    reserved:       { label: 'Reset ke Reservasi', cls: 'btn-reset' },
   };
 
   const grid = document.getElementById('pms-action-grid');
   grid.innerHTML = allowed.map(s => {
-    const m = actionMeta[s] || { emoji: '', label: s, cls: '' };
+    const m = actionMeta[s] || { label: s, cls: '' };
     return `<button class="pms-action-btn ${m.cls}" data-status="${s}">
-      <span class="btn-emoji">${m.emoji}</span>
       ${m.label}
     </button>`;
   }).join('');
