@@ -74,8 +74,8 @@ Sistem menggunakan database relasional `hotel_booking` dengan dua tabel utama:
 
 ### 2. Clone Repository
 ```bash
-git clone https://github.com/fathiryasyaa/tugas_web.git
-cd tugas_web
+git clone https://github.com/fathiryasyaa/SmartHotel-PMS-AI-Cancellation-Predictor.git
+cd SmartHotel-PMS-AI-Cancellation-Predictor
 ```
 
 ### 3. Konfigurasi Virtual Environment
