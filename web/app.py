@@ -37,13 +37,18 @@ with open(os.path.join(MODEL_DIR, 'freq_country.json')) as f:
 
 # ── MySQL connection pool ───────────────────────────────────────────────────
 DB_CONFIG = {
-    'host':     'localhost',
-    'port':     3306,
-    'user':     'root',
-    'password': '',           # password XAMPP default kosong
-    'database': 'hotel_booking',
+    'host':     os.environ.get('DB_HOST', 'localhost'),
+    'port':     int(os.environ.get('DB_PORT', 3306)),
+    'user':     os.environ.get('DB_USER', 'root'),
+    'password': os.environ.get('DB_PASSWORD', ''),           # password XAMPP default kosong
+    'database': os.environ.get('DB_NAME', 'hotel_booking'),
     'charset':  'utf8mb4',
 }
+
+# Jika menghubungkan ke TiDB Cloud / SSL MySQL eksternal
+if os.environ.get('DB_SSL', '').lower() in ('true', '1', 'yes'):
+    DB_CONFIG['ssl_disabled'] = False
+
 
 pool = pooling.MySQLConnectionPool(
     pool_name='hotel_pool',
