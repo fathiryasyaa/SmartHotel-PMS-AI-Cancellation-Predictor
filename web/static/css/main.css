@@ -68,7 +68,7 @@ input, select, textarea, button { font-family: inherit; }
 .nav-container {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 0 2rem;
+  padding: 0 clamp(1rem, 3vw, 2rem);
   height: 72px;
   display: flex;
   align-items: center;
@@ -79,6 +79,7 @@ input, select, textarea, button { font-family: inherit; }
   display: flex;
   align-items: center;
   gap: 0.6rem;
+  z-index: 910;
 }
 
 .logo-symbol {
@@ -88,9 +89,10 @@ input, select, textarea, button { font-family: inherit; }
 
 .logo-text {
   font-family: 'Cormorant Garamond', serif;
-  font-size: 1.35rem;
+  font-size: clamp(1.15rem, 3.5vw, 1.35rem);
   color: var(--white);
   letter-spacing: 0.04em;
+  white-space: nowrap;
 }
 
 .nav-links {
@@ -129,21 +131,52 @@ input, select, textarea, button { font-family: inherit; }
 .hamburger {
   display: none;
   flex-direction: column;
+  justify-content: center;
+  align-items: center;
   gap: 5px;
-  background: none;
+  background: transparent;
   border: none;
   cursor: pointer;
-  padding: 4px;
+  padding: 8px;
+  min-width: 44px;
+  min-height: 44px;
+  z-index: 910;
+  border-radius: 6px;
+  transition: background 0.2s ease;
+}
+.hamburger:hover {
+  background: rgba(255, 255, 255, 0.08);
 }
 .hamburger span {
-  display: block; width: 24px; height: 2px;
-  background: var(--white); border-radius: 2px;
-  transition: var(--trans);
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: var(--white);
+  border-radius: 2px;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 0.2s ease,
+              background 0.2s ease;
+}
+
+/* Animasi hamburger jadi X saat menu terbuka */
+.hamburger.active span:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+  background: var(--gold-light);
+}
+.hamburger.active span:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0);
+}
+.hamburger.active span:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+  background: var(--gold-light);
 }
 
 /* ── BUTTONS ─────────────────────────────────────────── */
 .btn-primary {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   background: var(--gold);
   color: var(--dark);
   padding: 0.85rem 2.2rem;
@@ -152,9 +185,10 @@ input, select, textarea, button { font-family: inherit; }
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  transition: background var(--trans), transform var(--trans);
+  transition: background var(--trans), transform var(--trans), box-shadow var(--trans);
   cursor: pointer;
   border: none;
+  min-height: 44px;
 }
 .btn-primary:hover {
   background: var(--gold-light);
@@ -162,7 +196,9 @@ input, select, textarea, button { font-family: inherit; }
 }
 
 .btn-ghost {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   background: transparent;
   color: var(--white);
   padding: 0.85rem 2.2rem;
@@ -174,6 +210,7 @@ input, select, textarea, button { font-family: inherit; }
   border: 1.5px solid rgba(255,255,255,0.5);
   transition: all var(--trans);
   cursor: pointer;
+  min-height: 44px;
 }
 .btn-ghost:hover {
   border-color: var(--gold);
@@ -183,7 +220,7 @@ input, select, textarea, button { font-family: inherit; }
 /* ── SECTION HEADER ──────────────────────────────────── */
 .section-header {
   text-align: center;
-  margin-bottom: 3.5rem;
+  margin-bottom: clamp(2rem, 5vw, 3.5rem);
 }
 
 .section-eyebrow {
@@ -195,15 +232,17 @@ input, select, textarea, button { font-family: inherit; }
 }
 
 .section-title {
-  font-size: clamp(2rem, 4vw, 3rem);
-  margin-bottom: 1rem;
+  font-size: clamp(1.85rem, 5vw, 3rem);
+  margin-bottom: 0.8rem;
 }
 
 .section-desc {
   color: var(--mid);
   max-width: 560px;
   margin: 0 auto;
-  font-size: 0.92rem;
+  font-size: clamp(0.85rem, 2.5vw, 0.95rem);
+  line-height: 1.7;
+  padding: 0 1rem;
 }
 
 /* ── FOOTER ──────────────────────────────────────────── */
@@ -215,7 +254,7 @@ input, select, textarea, button { font-family: inherit; }
 .footer-inner {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 4rem 2rem 2.5rem;
+  padding: 4rem clamp(1rem, 3vw, 2rem) 2.5rem;
   display: grid;
   grid-template-columns: 2fr 1fr 1fr 1fr;
   gap: 3rem;
@@ -243,16 +282,17 @@ input, select, textarea, button { font-family: inherit; }
   font-size: 0.85rem;
   color: rgba(255,255,255,0.55);
   margin-bottom: 0.65rem;
+  padding: 0.2rem 0;
   transition: color var(--trans);
 }
 .footer-links a:hover,
 .staff-link:hover { color: var(--gold-light); }
-.staff-link { color: rgba(201,168,76,0.4) !important; }
+.staff-link { color: rgba(201,168,76,0.6) !important; }
 
 .footer-bottom {
   border-top: 1px solid rgba(255,255,255,0.08);
   text-align: center;
-  padding: 1.5rem 2rem;
+  padding: 1.5rem clamp(1rem, 3vw, 2rem);
   font-size: 0.8rem;
   color: rgba(255,255,255,0.3);
 }
@@ -262,12 +302,128 @@ input, select, textarea, button { font-family: inherit; }
 /* ── UTILITIES ───────────────────────────────────────── */
 .hidden { display: none !important; }
 
+/* Wrapper tabel agar bisa di-scroll horizontal di layar hp */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: 1rem;
+}
+
+/* Lock scroll saat menu mobile terbuka */
+body.menu-open {
+  overflow: hidden;
+}
+
+/* ── RESPONSIVE NAVBAR & GLOBAL ──────────────────────── */
 @media (max-width: 900px) {
-  .nav-links { display: none; }
-  .hamburger { display: flex; }
-  .footer-inner { grid-template-columns: 1fr 1fr; gap: 2rem; }
+  .hamburger {
+    display: flex;
+  }
+
+  /* Luxury Fullscreen/Dropdown Mobile Nav Drawer */
+  .nav-links {
+    position: fixed;
+    top: 72px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: calc(100vh - 72px);
+    background: rgba(17, 17, 17, 0.98);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    padding: 2rem 1.5rem 3rem;
+    gap: 0.4rem;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(-8px);
+    transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                visibility 0.25s;
+    overflow-y: auto;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 20px 48px rgba(0,0,0,0.6);
+    z-index: 899;
+  }
+
+  .nav-links.open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+
+  .nav-links li {
+    display: block;
+    width: 100%;
+  }
+
+  .nav-links a {
+    display: flex;
+    align-items: center;
+    padding: 0.95rem 1.2rem;
+    font-size: 0.92rem;
+    letter-spacing: 0.1em;
+    color: rgba(255, 255, 255, 0.85);
+    border-radius: 6px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    min-height: 48px;
+    transition: background var(--trans), color var(--trans), transform var(--trans);
+  }
+
+  .nav-links a:hover,
+  .nav-links a:focus {
+    background: rgba(201, 168, 76, 0.12);
+    color: var(--gold-light);
+    transform: translateX(4px);
+  }
+
+  .nav-links .nav-cta {
+    margin-top: 1rem;
+    justify-content: center;
+    text-align: center;
+    padding: 0.9rem 1.5rem !important;
+    font-size: 0.88rem !important;
+  }
+
+  .nav-links .nav-staff {
+    margin-top: 0.5rem;
+    color: rgba(201, 168, 76, 0.6) !important;
+    font-size: 0.8rem !important;
+    text-align: center;
+    justify-content: center;
+    border-bottom: none;
+  }
+
+  .footer-inner {
+    grid-template-columns: 1fr 1fr;
+    gap: 2.5rem;
+    padding: 3rem 1.5rem 2rem;
+  }
 }
 
 @media (max-width: 600px) {
-  .footer-inner { grid-template-columns: 1fr; }
+  .footer-inner {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    padding: 2.5rem 1.25rem 1.5rem;
+  }
+  .footer-brand {
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+  .footer-links {
+    text-align: center;
+  }
+}
+
+/* Hindari auto-zoom di iOS Safari saat fokus input */
+@media (max-width: 768px) {
+  input, select, textarea {
+    font-size: 16px !important;
+  }
 }

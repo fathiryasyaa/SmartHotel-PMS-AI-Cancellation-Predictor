@@ -5,11 +5,11 @@
 /* ── PAGE HEADER ─────────────────────────────────────── */
 .page-header {
   position: relative;
-  height: 280px;
+  height: clamp(180px, 26vh, 280px);
   background: url('https://images.unsplash.com/photo-1618773928121-c32242e63f39?w=1400') center/cover no-repeat;
   display: flex;
   align-items: flex-end;
-  padding-bottom: 3rem;
+  padding-bottom: clamp(1.5rem, 3vw, 3rem);
   margin-top: 72px;
 }
 
@@ -23,26 +23,26 @@
   position: relative;
   max-width: 1280px;
   margin: 0 auto;
-  padding: 0 2rem;
+  padding: 0 clamp(1rem, 3vw, 2rem);
   color: var(--white);
   width: 100%;
 }
 
 .page-header-content .section-eyebrow { color: var(--gold-light); margin-bottom: 0.4rem; }
 .page-header-content h1 {
-  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-size: clamp(1.75rem, 4.5vw, 3.2rem);
   color: var(--white);
   margin-bottom: 0.3rem;
 }
 .page-header-content p {
   color: rgba(255,255,255,0.7);
-  font-size: 0.9rem;
+  font-size: clamp(0.82rem, 2.5vw, 0.92rem);
 }
 
 /* ── BOOKING SECTION ─────────────────────────────────── */
 .booking-section {
   background: var(--cream);
-  padding: 4rem 2rem 6rem;
+  padding: clamp(1.5rem, 3.5vw, 4rem) clamp(0.75rem, 2.5vw, 2rem) clamp(3rem, 6vw, 6rem);
   min-height: calc(100vh - 280px - 72px);
 }
 
@@ -53,12 +53,28 @@
 }
 
 /* ── STEPS BAR ───────────────────────────────────────── */
+.steps-wrapper {
+  margin-bottom: 2.5rem;
+  text-align: center;
+}
+
 .steps-bar {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 2.5rem;
   gap: 0;
+}
+
+.steps-mobile-badge {
+  display: none;
+  font-size: 0.82rem;
+  color: var(--gold-dark);
+  margin-top: 0.85rem;
+  background: rgba(201,168,76,0.12);
+  border: 1px solid rgba(201,168,76,0.25);
+  padding: 0.35rem 1rem;
+  border-radius: 20px;
+  letter-spacing: 0.04em;
 }
 
 .step {
@@ -412,13 +428,42 @@
 .result-actions .btn-ghost:hover { color: var(--charcoal); border-color: var(--charcoal); }
 
 /* ── RESPONSIVE ──────────────────────────────────────── */
+@media (max-width: 768px) {
+  .form-row { grid-template-columns: 1fr; gap: 1rem; margin-bottom: 1.2rem; }
+  .form-row.three-col { grid-template-columns: 1fr; gap: 1rem; }
+}
+
 @media (max-width: 640px) {
-  .form-row { grid-template-columns: 1fr; }
-  .form-row.three-col { grid-template-columns: 1fr; }
-  .form-card { padding: 1.5rem; }
+  .form-card { padding: 1.5rem 1.25rem; }
   .summary-grid { grid-template-columns: 1fr; }
   .radio-group { grid-template-columns: 1fr; }
   .steps-bar .step span { display: none; }
+  .steps-mobile-badge { display: inline-block; }
+  .step-circle { width: 30px; height: 30px; font-size: 0.78rem; }
+  .step-line { margin: 0 0.5rem; max-width: 50px; }
+}
+
+@media (max-width: 480px) {
+  .form-card { padding: 1.25rem 0.9rem; }
+  .form-card-title { font-size: 1.35rem; margin-bottom: 1.2rem; }
+  .form-nav {
+    flex-direction: column-reverse;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+  .form-nav .btn-back,
+  .form-nav .btn-next,
+  .form-nav .btn-submit {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+    min-height: 48px;
+  }
+  .step-circle { width: 26px; height: 26px; font-size: 0.72rem; }
+  .step-line { margin: 0 0.25rem; }
+  .result-actions { flex-direction: column; width: 100%; gap: 0.75rem; }
+  .result-actions .btn-ghost,
+  .result-actions .btn-primary { width: 100%; justify-content: center; min-height: 48px; }
 }
 
 /* ── ADR DISPLAY (auto price) ────────────────────────── */
@@ -950,6 +995,50 @@
 }
 
 @media (max-width: 720px) {
-  .drp-calendar { min-width: 320px; }
-  .drp-cal-body { grid-template-columns: 1fr; }
+  .drp-calendar {
+    position: absolute;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    left: 0;
+    right: 0;
+    padding: 1rem 0.5rem;
+    box-sizing: border-box;
+  }
+  .drp-cal-body {
+    grid-template-columns: 1fr;
+    gap: 1.2rem 0;
+  }
+  .drp-months {
+    gap: 1rem;
+    font-size: 0.85rem;
+    flex: 1;
+    justify-content: center;
+  }
+  .drp-month-grid {
+    gap: 1px;
+  }
+  .drp-day {
+    min-height: 38px;
+    font-size: 0.78rem;
+    padding: 0.25rem 0.05rem;
+  }
+  .drp-day-price {
+    font-size: 0.55rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .drp-inputs {
+    flex-direction: row;
+  }
+  .drp-field {
+    padding: 0.6rem 0.65rem;
+  }
+  .drp-value {
+    font-size: 0.85rem;
+  }
+  .drp-label {
+    font-size: 0.62rem;
+  }
 }

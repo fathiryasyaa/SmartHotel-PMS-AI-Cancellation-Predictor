@@ -427,6 +427,14 @@ function goToStep(n) {
     if (i === n) el.classList.add('active');
     if (i < n)   el.classList.add('done');
   });
+
+  // update badge step mobile
+  const stepLabels = ['Pilih Kamar', 'Info Tamu', 'Detail Menginap', 'Konfirmasi'];
+  const mobileBadge = document.getElementById('steps-mobile-badge');
+  if (mobileBadge) {
+    mobileBadge.innerHTML = `Langkah ${n + 1} dari 4: <strong>${stepLabels[n] || ''}</strong>`;
+  }
+
   currentStep = n;
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }

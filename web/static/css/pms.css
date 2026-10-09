@@ -167,9 +167,20 @@
 /* ── RESPONSIVE ── */
 @media (max-width: 1200px) { .pms-kpi-grid { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 768px)  {
-  .pms-kpi-grid { grid-template-columns: 1fr 1fr; }
-  .pms-body { padding: 1.2rem; }
+  .pms-kpi-grid { grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+  .pms-body { padding: 1rem; }
   .pms-action-grid { grid-template-columns: 1fr; }
+  .pms-toolbar { flex-direction: column; align-items: stretch; }
+  .pms-filter-tabs {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 0.4rem;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+@media (max-width: 480px) {
+  .pms-kpi-num { font-size: 1.7rem; }
+  .pms-kpi { padding: 0.8rem 0.5rem; }
 }
 
 /* ── RISK LABEL (pengganti emoji dot) ── */

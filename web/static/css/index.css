@@ -471,17 +471,97 @@
 /* ── RESPONSIVE ──────────────────────────────────────── */
 @media (max-width: 1024px) {
   .amenities-inner,
-  .about-inner { grid-template-columns: 1fr; }
-  .amenities-gallery { order: -1; grid-template-rows: 220px 140px; }
-  .about-img { height: 340px; }
+  .about-inner {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+  .amenities-gallery {
+    order: -1;
+    grid-template-rows: 240px 140px;
+  }
+  .about-img {
+    height: 340px;
+  }
+  .testimonials-track {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 768px) {
-  .avail-container { flex-direction: column; height: auto; padding: 1.5rem; gap: 1rem; }
-  .avail-divider   { display: none; }
-  .avail-field     { padding: 0; width: 100%; }
-  .btn-avail       { width: 100%; justify-content: center; margin-left: 0; }
-  .stats-strip     { flex-wrap: wrap; }
-  .stat-item       { flex: 1 1 50%; }
-  .testimonials-track { grid-template-columns: 1fr; }
+  .avail-container {
+    flex-direction: column;
+    height: auto;
+    padding: 1.5rem;
+    gap: 1rem;
+  }
+  .avail-divider { display: none; }
+  .avail-field   { padding: 0; width: 100%; }
+  .btn-avail     { width: 100%; justify-content: center; margin-left: 0; }
+
+  /* 2x2 grid stats strip di tablet & hp */
+  .stats-strip {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .stat-item {
+    max-width: none;
+    padding: 1.8rem 1rem;
+    border-right: none;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .stat-item:nth-child(odd) {
+    border-right: 1px solid rgba(255,255,255,0.06);
+  }
+  .stat-item:nth-child(3),
+  .stat-item:nth-child(4) {
+    border-bottom: none;
+  }
+  .stat-num {
+    font-size: clamp(1.8rem, 5vw, 2.2rem);
+  }
+
+  .testimonials-track {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 540px) {
+  .hero-content {
+    padding: 0 1rem;
+  }
+  .hero-actions {
+    flex-direction: column;
+    width: 100%;
+    max-width: 320px;
+    margin: 0 auto;
+    gap: 0.75rem;
+  }
+  .hero-actions .btn-primary,
+  .hero-actions .btn-ghost {
+    width: 100%;
+    text-align: center;
+  }
+  .amenities-gallery {
+    grid-template-rows: 180px 100px;
+    gap: 0.6rem;
+  }
+  .about-img {
+    height: 240px;
+  }
+  .rooms-grid {
+    grid-template-columns: 1fr;
+  }
+  .room-card.featured .room-img,
+  .room-img {
+    height: 200px;
+  }
+  .room-info {
+    padding: 1.25rem;
+  }
+}
+
+@media (max-height: 660px) {
+  .hero-scroll {
+    display: none;
+  }
 }

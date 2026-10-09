@@ -1,4 +1,4 @@
-﻿/* ── LOGIN PAGE STYLES ── */
+/* ── LOGIN PAGE STYLES ── */
 
 :root {
   --gold:       #C9A84C;
@@ -212,8 +212,35 @@ body {
 }
 .login-back a:hover { color: #9A7A2E; }
 
+.login-mobile-brand {
+  display: none;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+.login-mobile-brand .logo-symbol {
+  color: var(--gold);
+  font-size: 1.2rem;
+}
+.login-mobile-brand .logo-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.35rem;
+  color: var(--dark);
+  letter-spacing: 0.04em;
+}
+
 /* ── RESPONSIVE ── */
 @media (max-width: 768px) {
+  body {
+    flex-direction: column;
+    justify-content: center;
+  }
   .login-visual { display: none; }
-  .login-panel  { width: 100%; padding: 2.5rem 1.5rem; }
+  .login-mobile-brand { display: flex; }
+  .login-panel  {
+    width: 100%;
+    min-height: 100vh;
+    padding: clamp(2rem, 5vw, 3.5rem) clamp(1.2rem, 4vw, 2.5rem);
+    justify-content: center;
+  }
 }

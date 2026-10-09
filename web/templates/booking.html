@@ -26,6 +26,9 @@
         <li><a href="/staff/login" class="nav-staff">Staff Login</a></li>
         <li><a href="/booking" class="nav-cta active">Pesan Sekarang</a></li>
       </ul>
+      <button class="hamburger" id="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
     </div>
   </nav>
 
@@ -44,25 +47,30 @@
     <div class="booking-container" style="max-width:960px">
 
       <!-- STEPS INDICATOR -->
-      <div class="steps-bar">
-        <div class="step active" id="step-ind-0">
-          <div class="step-circle">1</div>
-          <span>Pilih Kamar</span>
+      <div class="steps-wrapper">
+        <div class="steps-bar">
+          <div class="step active" id="step-ind-0">
+            <div class="step-circle">1</div>
+            <span>Pilih Kamar</span>
+          </div>
+          <div class="step-line"></div>
+          <div class="step" id="step-ind-1">
+            <div class="step-circle">2</div>
+            <span>Info Tamu</span>
+          </div>
+          <div class="step-line"></div>
+          <div class="step" id="step-ind-2">
+            <div class="step-circle">3</div>
+            <span>Detail Menginap</span>
+          </div>
+          <div class="step-line"></div>
+          <div class="step" id="step-ind-3">
+            <div class="step-circle">4</div>
+            <span>Konfirmasi</span>
+          </div>
         </div>
-        <div class="step-line"></div>
-        <div class="step" id="step-ind-1">
-          <div class="step-circle">2</div>
-          <span>Info Tamu</span>
-        </div>
-        <div class="step-line"></div>
-        <div class="step" id="step-ind-2">
-          <div class="step-circle">3</div>
-          <span>Detail Menginap</span>
-        </div>
-        <div class="step-line"></div>
-        <div class="step" id="step-ind-3">
-          <div class="step-circle">4</div>
-          <span>Konfirmasi</span>
+        <div class="steps-mobile-badge" id="steps-mobile-badge">
+          Langkah 1 dari 4: <strong>Pilih Kamar</strong>
         </div>
       </div>
 
@@ -364,6 +372,7 @@
     </div>
   </footer>
 
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
   <script src="{{ url_for('static', filename='js/datepicker.js') }}"></script>
   <script src="{{ url_for('static', filename='js/booking.js') }}"></script>
 </body>

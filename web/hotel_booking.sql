@@ -78,12 +78,30 @@ CREATE TABLE IF NOT EXISTS room_inventory (
 
 -- Inisialisasi kapasitas stok kamar default
 INSERT IGNORE INTO room_inventory (room_type, total_rooms, available_rooms) VALUES
-    ('A', 30, 30),
-    ('B', 15, 15),
-    ('C', 20, 20),
-    ('D', 25, 25),
-    ('E', 15, 15),
-    ('F', 10, 10),
-    ('G',  8,  8),
-    ('H',  5,  5),
-    ('L',  3,  3);
+    ('A', 40, 40),
+    ('B', 35, 35),
+    ('C', 30, 30),
+    ('D', 20, 20),
+    ('E', 25, 25),
+    ('F', 15, 15),
+    ('G', 10, 10),
+    ('H',  8,  8),
+    ('I',  4,  4),
+    ('L',  2,  2);
+
+-- ------------------------------------------------------------
+-- 3. Trigger: Otomatis Kembalikan Stok Kamar saat Data Booking Dihapus
+-- ------------------------------------------------------------
+DROP TRIGGER IF EXISTS trg_bookings_after_delete;
+DELIMITER //
+CREATE TRIGGER trg_bookings_after_delete
+AFTER DELETE ON bookings
+FOR EACH ROW
+BEGIN
+    IF OLD.pms_status IN ('reserved', 'checked_in') AND OLD.deleted_at IS NULL THEN
+        UPDATE room_inventory
+        SET available_rooms = LEAST(available_rooms + 1, total_rooms)
+        WHERE room_type = OLD.reserved_room_type;
+    END IF;
+END //
+DELIMITER ;

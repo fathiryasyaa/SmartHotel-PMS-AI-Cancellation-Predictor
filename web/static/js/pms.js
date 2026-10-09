@@ -291,6 +291,14 @@ function initSidebarToggle() {
   document.getElementById('sidebar-toggle')?.addEventListener('click', () => {
     document.getElementById('sidebar').classList.toggle('open');
   });
+
+  document.addEventListener('click', e => {
+    const sidebar = document.getElementById('sidebar');
+    const toggle  = document.getElementById('sidebar-toggle');
+    if (sidebar && !sidebar.contains(e.target) && !toggle?.contains(e.target)) {
+      sidebar.classList.remove('open');
+    }
+  });
 }
 
 // tampilkan toast notifikasi di pojok bawah

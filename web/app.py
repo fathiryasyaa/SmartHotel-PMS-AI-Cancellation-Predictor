@@ -127,8 +127,14 @@ def init_db():
             available_rooms SMALLINT    NOT NULL DEFAULT 0,
             updated_at      DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP
                             ON UPDATE CURRENT_TIMESTAMP
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     """)
+
+    # Pastikan collation room_inventory selaras dengan bookings
+    try:
+        cur.execute("ALTER TABLE room_inventory CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci")
+    except Exception:
+        pass
 
     # Tambah kolom baru jika tabel sudah ada tapi belum punya kolom PMS
     alter_stmts = [
@@ -157,9 +163,62 @@ def init_db():
                 ON DUPLICATE KEY UPDATE total_rooms = VALUES(total_rooms)
             """, (rtype, total, total))
 
+    # Trigger database: jika ada reservasi aktif dihapus langsung di database, kembalikan stok kamar
+    try:
+        cur.execute("DROP TRIGGER IF EXISTS trg_bookings_after_delete")
+        cur.execute("""
+            CREATE TRIGGER trg_bookings_after_delete
+            AFTER DELETE ON bookings
+            FOR EACH ROW
+            BEGIN
+                IF OLD.pms_status IN ('reserved', 'checked_in') AND OLD.deleted_at IS NULL THEN
+                    UPDATE room_inventory
+                    SET available_rooms = LEAST(available_rooms + 1, total_rooms)
+                    WHERE room_type = OLD.reserved_room_type;
+                END IF;
+            END
+        """)
+    except Exception as e:
+        print(f"Warning: gagal membuat trigger trg_bookings_after_delete: {e}")
+
     conn.commit()
+
+    # Sinkronkan stok kamar dengan reservasi aktual yang ada
+    sync_room_inventory(conn)
+
     cur.close()
     conn.close()
+
+
+def sync_room_inventory(conn=None):
+    """Sinkronisasi stok room_inventory agar selalu akurat dengan data reservasi aktif di tabel bookings."""
+    should_close = False
+    if conn is None:
+        conn = get_conn()
+        should_close = True
+    cur = conn.cursor()
+    try:
+        cur.execute("""
+            UPDATE room_inventory r
+            SET r.available_rooms = GREATEST(
+                r.total_rooms - COALESCE((
+                    SELECT COUNT(*)
+                    FROM bookings b
+                    WHERE b.reserved_room_type = r.room_type
+                      AND b.pms_status IN ('reserved', 'checked_in')
+                      AND b.deleted_at IS NULL
+                ), 0),
+                0
+            )
+        """)
+        conn.commit()
+    except Exception as e:
+        conn.rollback()
+        print(f"Warning: gagal sinkronisasi room_inventory: {e}")
+    finally:
+        cur.close()
+        if should_close:
+            conn.close()
 
 
 # Inisialisasi tabel saat startup
@@ -445,6 +504,8 @@ def staff_logout():
 # ── API: ketersediaan kamar (real-time) ─────────────────────────────────────
 @app.route('/api/room-availability')
 def api_room_availability():
+    if request.args.get('sync') == '1':
+        sync_room_inventory()
     conn = get_conn()
     cur  = conn.cursor()
     cur.execute("""
@@ -460,6 +521,12 @@ def api_room_availability():
         for r in rows
     }
     return jsonify(result)
+
+
+@app.route('/api/room-inventory/sync', methods=['GET', 'POST'])
+def api_sync_room_inventory():
+    sync_room_inventory()
+    return jsonify({'success': True, 'message': 'Stok kamar berhasil disinkronkan dengan reservasi aktual.'})
 
 
 # ── API: buat reservasi ──────────────────────────────────────────────────────
