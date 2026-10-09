@@ -1,211 +1,205 @@
-# 🏨 The Grand Azura Hotel — Web App & AI Cancellation Prediction
+# The Grand Azura — Hotel Booking & Cancellation Prediction System
 
-Aplikasi web sistem reservasi hotel modern yang terintegrasi dengan **Machine Learning (XGBoost)** untuk memprediksi risiko pembatalan reservasi tamu secara *real-time*. Dilengkapi modul **Property Management System (PMS)** dan **Dashboard Analitik** untuk staf hotel.
+Aplikasi web sistem reservasi hotel *end-to-end* yang mengintegrasikan model *Machine Learning* (XGBoost) untuk memprediksi probabilitas pembatalan reservasi tamu secara *real-time*. Dilengkapi modul Property Management System (PMS) dan Dashboard Analitik untuk operasional staf hotel.
 
-Dibuat untuk keperluan **Tugas Besar / Tugas Kelompok Pemrograman Web (PEM.WEB)**.
-
----
-
-## 📌 Daftar Isi
-1. [Prasyarat Sistem](#1-prasyarat-sistem)
-2. [Langkah-Langkah Menjalankan (Untuk Anggota Kelompok)](#2-langkah-langkah-menjalankan-untuk-anggota-kelompok)
-3. [Setup Database MySQL (XAMPP)](#3-setup-database-mysql-xampp)
-4. [Daftar Halaman & Akun Login](#4-daftar-halaman--akun-login)
-5. [Fitur-Fitur Utama](#5-fitur-fitur-utama)
-6. [Struktur Folder Proyek](#6-struktur-folder-proyek)
-7. [Panduan Kolaborasi Git](#7-panduan-kolaborasi-git)
-8. [Troubleshooting (Solusi Masalah Umum)](#8-troubleshooting-solusi-masalah-umum)
+Proyek ini dibangun menggunakan Python (Flask), MySQL, dan Vanilla JavaScript/CSS dengan penekanan pada performa, validasi data yang ketat, dan integrasi inferensi model *machine learning*.
 
 ---
 
-## 1. Prasyarat Sistem
-Sebelum menjalankan proyek di laptop kalian, pastikan sudah terpasang:
-* **Python** (versi 3.10 atau lebih baru)
-* **XAMPP** (untuk Apache & MySQL Database)
-* **Git**
-* Web Browser modern (Google Chrome, Microsoft Edge, Firefox, dll)
+## Daftar Isi
+- [Teknologi yang Digunakan](#teknologi-yang-digunakan)
+- [Arsitektur & Fitur Utama](#arsitektur--fitur-utama)
+- [Struktur Database](#struktur-database)
+- [Panduan Instalasi & Menjalankan](#panduan-instalasi--menjalankan)
+- [Konfigurasi Database](#konfigurasi-database)
+- [Daftar Rute & Kredensial Staf](#daftar-rute--kredensial-staf)
+- [Dokumentasi API](#dokumentasi-api)
+- [Pipeline Machine Learning](#pipeline-machine-learning)
+- [Struktur Proyek](#struktur-proyek)
 
 ---
 
-## 2. Langkah-Langkah Menjalankan (Untuk Anggota Kelompok)
+## Teknologi yang Digunakan
 
-### Langkah 1: Clone Repository
-Buka terminal / Command Prompt / Git Bash, lalu jalankan:
+- **Backend**: Python 3.10+, Flask, MySQL Connector Python (Connection Pooling)
+- **Machine Learning**: XGBoost, Scikit-learn, Joblib, NumPy, Pandas
+- **Database**: MySQL / MariaDB (InnoDB Engine, ACID-compliant)
+- **Frontend**: HTML5 Semantik, Vanilla CSS (Modern CSS Variables, Flexbox/Grid), Vanilla JavaScript (ES6+)
+
+---
+
+## Arsitektur & Fitur Utama
+
+### 1. Portal Reservasi Tamu (Guest Portal)
+- **Katalog Kamar Terpisah**: Pemilihan kamar disesuaikan secara dinamis berdasarkan jenis hotel (City Hotel atau Resort Hotel).
+- **Date Range Picker Interaktif**: Kalender kustom dua panel untuk pemilihan tanggal check-in dan check-out, kalkulasi otomatis durasi malam, dan perhitungan total biaya menginap.
+- **Validasi Kontak Standar E.164**: Input nomor telepon/WhatsApp dibatasi maksimal 15 digit angka dengan normalisasi otomatis untuk format komunikasi internasional.
+- **Pengecekan Stok Kamar Real-Time**: Sinkronisasi stok kamar yang tersedia melalui API backend secara berkala.
+- **Cek Status Reservasi Mandiri**: Tamu dapat memeriksa status reservasi mereka menggunakan ID Reservasi dan email terdaftar.
+
+### 2. Modul Staf & Property Management System (PMS)
+- **Manajemen Siklus Kamar**: Pelacakan dan pembaruan status kamar secara operasional (`Reserved` -> `Checked-in` -> `Checked-out` / `Canceled`).
+- **Integrasi Komunikasi Langsung**: Tautan cepat untuk menghubungi tamu via telepon (`tel:`), chat WhatsApp langsung (`https://wa.me/...`), dan email (`mailto:`).
+- **Pencarian Cepat**: Filter pencarian instan berdasarkan kode booking, nama tamu, nomor telepon, dan email.
+
+### 3. Dashboard Analitik & Prediksi Risiko AI
+- **Skoring Risiko Pembatalan**: Setiap reservasi yang masuk langsung dinilai probabilitas pembatalannya oleh model XGBoost ke dalam tingkatan risiko (*Low*, *Medium*, *High*).
+- **Tindak Lanjut Risiko Tinggi (High Risk Follow-up)**: Antarmuka khusus bagi staf untuk memprioritaskan konfirmasi ulang atau penagihan deposit pada reservasi berisiko tinggi.
+- **Metrik Kunci Operasional**: Visualisasi jumlah reservasi aktif, rata-rata probabilitas pembatalan, dan distribusi tingkat risiko.
+
+---
+
+## Struktur Database
+
+Sistem menggunakan database relasional `hotel_booking` dengan dua tabel utama:
+
+1. **`bookings`**:
+   - Menyimpan seluruh atribut reservasi tamu (tanggal kedatangan, jumlah tamu, tipe kamar, durasi menginap, lead time, ADR, preferensi kamar).
+   - Menyimpan hasil inferensi model AI (`probability`, `prediction`, `risk_level`, `policy`).
+   - Menyimpan status siklus operasional PMS (`pms_status`, `checkin_at`, `checkout_at`, `canceled_at`, `cancel_reason`).
+   - Mendukung pencatatan riwayat penghapusan data secara aman (*soft delete* melalui `deleted_at`, `deleted_by`, `delete_reason`).
+
+2. **`room_inventory`**:
+   - Melacak kapasitas total dan ketersediaan kamar secara *real-time* untuk setiap tipe kamar (A hingga L).
+   - Pengurangan stok kamar saat reservasi dilakukan secara atomik menggunakan transaksi SQL `SELECT ... FOR UPDATE`.
+
+---
+
+## Panduan Instalasi & Menjalankan
+
+### 1. Prasyarat Sistem
+- Python versi 3.10 atau yang lebih baru
+- MySQL Server (misalnya melalui XAMPP atau instalasi MySQL lokal terpisah)
+- Git
+
+### 2. Clone Repository
 ```bash
 git clone https://github.com/fathiryasyaa/tugas_web.git
 cd tugas_web
 ```
 
-### Langkah 2: Buat & Aktifkan Virtual Environment (venv)
-Sangat disarankan memakai `venv` agar paket Python tidak bentrok:
-* **Pengguna Windows (PowerShell / Command Prompt)**:
-  ```powershell
-  python -m venv venv
-  .\venv\Scripts\activate
-  ```
-  *(Jika muncul error script execution policy di PowerShell, jalankan `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass` lalu ulangi activate).*
-* **Pengguna Linux / macOS**:
-  ```bash
-  python3 -m venv venv
-  source venv/bin/activate
-  ```
+### 3. Konfigurasi Virtual Environment
+Disarankan untuk menggunakan virtual environment agar dependensi paket terisolasi dengan rapi:
 
-### Langkah 3: Install Dependensi Python
-Pastikan virtual environment sudah aktif (ada tanda `(venv)` di awal baris terminal), lalu install dependensi:
+**Windows (PowerShell / Command Prompt):**
+```powershell
+python -m venv venv
+.\venv\Scripts\activate
+```
+
+**macOS / Linux:**
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+### 4. Instalasi Dependensi
+Pastikan virtual environment telah aktif, lalu jalankan:
 ```bash
 pip install -r web/requirements.txt
 ```
 
-### Langkah 4: Nyalakan Database MySQL
-1. Buka aplikasi **XAMPP Control Panel**.
-2. Klik tombol **Start** pada modul **MySQL** (dan Apache jika perlu).
-3. Pastikan MySQL berjalan di port default `3306`.
-4. *(Lihat bagian [Setup Database](#3-setup-database-mysql-xampp) di bawah jika database belum dibuat).*
-
-### Langkah 5: Jalankan Server Flask
-Masuk ke folder `web` dan jalankan `app.py`:
+### 5. Menjalankan Server Aplikasi
+Masuk ke direktori `web` dan jalankan script utama:
 ```bash
 cd web
 python app.py
 ```
-Jika berhasil, terminal akan menampilkan output:
-```
-* Running on http://127.0.0.1:5000
-```
-Buka browser dan akses **`http://localhost:5000`**.
+Aplikasi akan aktif dan dapat diakses pada browser melalui alamat `http://localhost:5000`.
 
 ---
 
-## 3. Setup Database MySQL (XAMPP)
+## Konfigurasi Database
 
-Konfigurasi koneksi database default di [`web/app.py`](web/app.py):
-* **Host**: `localhost`
-* **Port**: `3306`
-* **User**: `root`
-* **Password**: ` ` *(kosong — default XAMPP)*
-* **Database**: `hotel_booking`
+Secara default, aplikasi menggunakan konfigurasi koneksi MySQL standar (seperti pada XAMPP):
+- **Host**: `localhost`
+- **Port**: `3306`
+- **User**: `root`
+- **Password**: *(kosong)*
+- **Database**: `hotel_booking`
 
-### Cara 1: Menggunakan phpMyAdmin (Disarankan)
-1. Buka browser dan kunjungi `http://localhost/phpmyadmin`.
-2. Klik menu **"New"** / **"Baru"** di sebelah kiri.
-3. Buat database baru bernama: **`hotel_booking`** (Collation: `utf8mb4_unicode_ci` atau default).
-4. Klik tab **"Import"**, pilih file **`web/hotel_booking.sql`**, lalu klik **"Go / Kirim"**.
+Jika menggunakan kredensial berbeda, sesuaikan variabel `DB_CONFIG` di dalam file `web/app.py`.
 
-### Cara 2: Inisialisasi Otomatis via `app.py`
-Cukup buat database kosong `hotel_booking` di phpMyAdmin, saat `python app.py` dijalankan pertama kali, sistem akan secara otomatis membuat tabel `bookings` dan `room_inventory` beserta data defaultnya.
+### Inisialisasi Skema Database:
+Anda dapat mengimpor file `web/hotel_booking.sql` ke dalam phpMyAdmin/MySQL CLI, atau cukup buat database kosong dengan nama `hotel_booking`. Fungsi inisialisasi pada `app.py` akan otomatis mendeteksi dan membuat struktur tabel yang diperlukan saat server pertama kali dijalankan.
 
 ---
 
-## 4. Daftar Halaman & Akun Login
+## Daftar Rute & Kredensial Staf
 
-| Halaman | URL | Keterangan |
+| Rute | Akses | Deskripsi |
 |---|---|---|
-| **Landing Page** | `http://localhost:5000/` | Halaman utama hotel untuk tamu, galeri kamar, dan fasilitas |
-| **Form Reservasi** | `http://localhost:5000/booking` | Pemilihan kamar, input data tamu, date range picker & kalkulasi harga |
-| **Cek Reservasi Tamu** | `http://localhost:5000/my-booking` | Tamu dapat mengecek status booking menggunakan ID Reservasi & Email |
-| **Login Staf** | `http://localhost:5000/staff/login` | Akses masuk portal operasional hotel |
-| **Staff PMS** | `http://localhost:5000/pms` | Property Management: kelola check-in/out, kontak tamu (Telepon & WA langsung) |
-| **Staff Dashboard** | `http://localhost:5000/dashboard` | Monitoring risiko pembatalan Machine Learning & statistik reservasi |
+| `/` | Publik | Halaman utama hotel, portofolio fasilitas, dan galeri kamar |
+| `/booking` | Publik | Alur formulir reservasi kamar tamu multi-langkah |
+| `/my-booking` | Publik | Pelacakan status reservasi tamu mandiri |
+| `/staff/login` | Publik | Halaman autentikasi staf |
+| `/pms` | Staf | Property Management System untuk manajemen operasional kamar |
+| `/dashboard` | Staf | Dashboard analitik risiko pembatalan Machine Learning |
 
-### 🔑 Kredensial Login Staf:
-* **Password**: `fathir123`
-*(Tidak memerlukan username, cukup masukkan password staf di atas)*.
-
----
-
-## 5. Fitur-Fitur Utama
-
-### 🌟 Sisi Tamu (Guest)
-* **Katalog Kamar Dinamis**: Filter kamar berdasarkan tipe hotel (*City Hotel* di perkotaan atau *Resort Hotel* di tepi pantai).
-* **Date Range Picker Modern**: Kalender interaktif pemilihan tanggal check-in & check-out, kalkulasi otomatis durasi malam & perkiraan total harga.
-* **Input Kontak Terstandarisasi**: Input nomor telepon/WhatsApp dengan batas otomatis maksimal 15 digit angka (standar internasional E.164).
-* **Cek Status Booking Mandiri**: Tamu dapat melacak status reservasi mereka tanpa harus login.
-
-### 💼 Sisi Staf & Hotel (Staff / PMS)
-* **Property Management System (PMS)**:
-  * Pelacakan status kamar: `Reserved` ➔ `Checked-in` ➔ `Checked-out` / `Canceled`.
-  * Tombol aksi kontak langsung: Shortcut telepon (`tel:`), chat WhatsApp otomatis (`https://wa.me/62...`), dan email (`mailto:`).
-  * Filter pencarian cepat berdasarkan nama tamu, kode booking, nomor HP, atau email.
-* **Integrasi AI / Machine Learning (XGBoost)**:
-  * Model memprediksi tingkat probabilitas pembatalan reservasi tamu.
-  * Klasifikasi risiko: **Low Risk**, **Medium Risk**, dan **High Risk**.
-  * Kartu penanganan risiko tinggi untuk mempermudah staf hotel melakukan tindak lanjut (*follow-up*) deposit atau konfirmasi.
+### Kredensial Akun Staf:
+- **Password**: `fathir123`
+*(Sistem menggunakan autentikasi sesi berbasis kunci staf)*
 
 ---
 
-## 6. Struktur Folder Proyek
+## Dokumentasi API
+
+### Publik
+- `POST /api/booking`: Menerima data payload reservasi, menjalankan inferensi XGBoost, mengurangi stok kamar, dan menyimpan data reservasi.
+- `GET /api/room-availability`: Mengembalikan data kapasitas dan sisa kamar yang tersedia secara *real-time*.
+- `GET /api/my-booking`: Mengambil informasi detail reservasi berdasarkan kombinasi ID booking dan email tamu.
+
+### Terproteksi (Login Diperlukan)
+- `GET /api/bookings`: Mengambil daftar seluruh reservasi aktif (non-deleted).
+- `GET /api/pms/bookings`: Mengambil daftar reservasi untuk operasional PMS.
+- `POST /api/pms/status`: Memperbarui status operasional reservasi (`checkin`, `checkout`, `cancel`).
+- `GET /api/stats`: Mengembalikan statistik agregat (total booking, distribusi risiko, rata-rata probabilitas pembatalan).
+- `DELETE /api/booking/<booking_id>`: Melakukan *soft-delete* reservasi dengan menyertakan alasan penghapusan dan nama staf.
+
+---
+
+## Pipeline Machine Learning
+
+Model klasifikasi dikembangkan menggunakan Jupyter Notebook (`ProjectAkhir.ipynb`) dengan alur sebagai berikut:
+1. **Dataset**: Hotel Booking Demand dataset (mencakup data lead time, saluran distribusi, riwayat pembatalan, segmen pasar, ADR, dan permintaan khusus).
+2. **Preprocessing**:
+   - Pembersihan data pencilan (*outliers*) dan penanganan nilai kosong.
+   - Penskalaan fitur numerik menggunakan `StandardScaler`.
+   - *Frequency encoding* pada fitur berkategori tinggi (seperti negara asal).
+   - *One-hot encoding* pada variabel kategori nominal.
+3. **Model**: XGBoost Classifier yang dioptimasi untuk akurasi klasifikasi biner (`0 = Check-Out / Tidak Batal`, `1 = Canceled / Batal`).
+4. **Artefak yang Digunakan Web**:
+   - `web/model/xgb_model.pkl`: Model XGBoost serialisasi.
+   - `web/model/scaler.pkl`: StandardScaler fitted.
+   - `web/model/feature_names.json`: Daftar urutan fitur masukan model.
+   - `web/model/freq_country.json`: Bobot pemetaan frekuensi negara asal.
+
+---
+
+## Struktur Proyek
 
 ```text
 tugas_web/
-├── .gitignore               ← Mengabaikan venv, cache, file sementara
-├── README.md                ← Panduan utama proyek (file ini)
-├── ProjectAkhir.ipynb       ← Jupyter Notebook analisis data & training model XGBoost
-├── dataset/                 ← Dataset pelatihan hotel booking (.csv)
-├── venv/                    ← Virtual environment Python (tidak di-push ke git)
-└── web/                     ← Source code aplikasi web Flask
-    ├── app.py               ← Server Flask, routing, endpoint API, koneksi MySQL
-    ├── requirements.txt     ← Daftar pustaka Python yang dibutuhkan
-    ├── hotel_booking.sql    ← Skema database MySQL lengkap
-    ├── model/               ← Artefak model Machine Learning yang telah dilatih
-    │   ├── xgb_model.pkl    ← Model XGBoost tersimpan
-    │   ├── scaler.pkl       ← StandardScaler
-    │   ├── feature_names.json ← Daftar fitur input model
-    │   └── freq_country.json  ← Frekuensi encoding negara asal
-    ├── templates/           ← File template HTML (Jinja2)
-    │   ├── index.html       ← Halaman utama
-    │   ├── booking.html     ← Form multi-step reservasi
-    │   ├── my_booking.html  ← Cek status reservasi tamu
-    │   ├── login.html       ← Login staf
-    │   ├── pms.html         ← Property Management System (PMS)
-    │   └── dashboard.html   ← Dashboard analitik staf
-    └── static/              ← File statis (CSS & JavaScript)
-        ├── css/             ← Berkas stylesheet per halaman
-        └── js/              ← Berkas script logika interaktif
+|-- README.md                  # Dokumentasi utama proyek
+|-- ProjectAkhir.ipynb         # Eksplorasi data, pelatihan, dan evaluasi model ML
+|-- dataset/                   # Dataset hotel booking
+|-- web/
+    |-- app.py                 # Backend Flask, routing, logika bisnis, & inferensi ML
+    |-- requirements.txt       # Daftar pustaka Python yang dibutuhkan
+    |-- hotel_booking.sql      # Skema tabel dan data inisialisasi database
+    |-- model/                 # Artefak model machine learning
+    |   |-- xgb_model.pkl
+    |   |-- scaler.pkl
+    |   |-- feature_names.json
+    |   |-- freq_country.json
+    |-- templates/             # Template Jinja2 HTML
+    |   |-- index.html
+    |   |-- booking.html
+    |   |-- my_booking.html
+    |   |-- login.html
+    |   |-- pms.html
+    |   |-- dashboard.html
+    |-- static/                # Aset statis aplikasi
+        |-- css/               # Modular styling CSS
+        |-- js/                # Logika antarmuka JavaScript
 ```
-
----
-
-## 7. Panduan Kolaborasi Git
-
-Agar pengerjaan tugas kelompok berjalan lancar dan tidak terjadi konflik kode (*merge conflict*), ikuti aturan praktis berikut:
-
-1. **Selalu Tarik Perubahan Terbaru Sebelum Mulai Ngoding**:
-   ```bash
-   git checkout main
-   git pull origin main
-   ```
-2. **Jika Ingin Mengerjakan Fitur Baru, Buat Branch Sendiri**:
-   ```bash
-   git checkout -b fitur-nama-kalian
-   # contoh: git checkout -b fitur-laporan-keuangan
-   ```
-3. **Commit Perubahan dengan Pesan yang Jelas**:
-   ```bash
-   git add .
-   git commit -m "feat: menambah tombol cetak invoice di pms"
-   ```
-4. **Push ke Branch Kalian**:
-   ```bash
-   git push origin fitur-nama-kalian
-   ```
-5. **Konfirmasi ke Tim**: Kabari teman kelompok di grup WhatsApp sebelum melakukan merge ke `main`.
-
----
-
-## 8. Troubleshooting (Solusi Masalah Umum)
-
-### Q: `Can't connect to MySQL server on 'localhost'`
-> **Solusi**: Pastikan XAMPP sudah dibuka dan service **MySQL** sudah dalam kondisi **Running** (berwarna hijau).
-
-### Q: `Access denied for user 'root'@'localhost'`
-> **Solusi**: Jika MySQL di laptop kalian menggunakan password khusus (bukan kosong), buka file [`web/app.py`](web/app.py) baris ~43, ubah parameter `'password': ''` sesuai password MySQL laptop kalian.
-
-### Q: `ModuleNotFoundError: No module named 'flask'` (atau modul lainnya)
-> **Solusi**: Virtual environment belum aktif atau dependensi belum terinstall. Jalankan `.\venv\Scripts\activate` lalu `pip install -r web/requirements.txt`.
-
-### Q: Model `.pkl` tidak ditemukan saat server dijalankan?
-> **Solusi**: Pastikan folder `web/model/` berisi file `xgb_model.pkl` dan artefak lainnya. Seluruh artefak model sudah tersedia di repository ini dan tidak perlu di-train ulang dari awal.
-
----
-
-Jika ada pertanyaan atau kendala saat menjalankan web, silakan diskusikan di grup koordinasi tugas kelompok! Selamat mengerjakan! 🚀
