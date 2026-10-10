@@ -37,11 +37,11 @@ with open(os.path.join(MODEL_DIR, 'freq_country.json')) as f:
 
 # ── MySQL connection pool ───────────────────────────────────────────────────
 DB_CONFIG = {
-    'host':     os.environ.get('DB_HOST', 'localhost'),
-    'port':     int(os.environ.get('DB_PORT', 3306)),
-    'user':     os.environ.get('DB_USER', 'root'),
-    'password': os.environ.get('DB_PASSWORD', ''),           # password XAMPP default kosong
-    'database': os.environ.get('DB_NAME', 'hotel_booking'),
+    'host':     os.environ.get('DB_HOST', os.environ.get('MYSQLHOST', 'localhost')),
+    'port':     int(os.environ.get('DB_PORT', os.environ.get('MYSQLPORT', 3306))),
+    'user':     os.environ.get('DB_USER', os.environ.get('MYSQLUSER', 'root')),
+    'password': os.environ.get('DB_PASSWORD', os.environ.get('MYSQLPASSWORD', '')),
+    'database': os.environ.get('DB_NAME', os.environ.get('MYSQLDATABASE', 'hotel_booking')),
     'charset':  'utf8mb4',
 }
 
