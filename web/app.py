@@ -50,15 +50,22 @@ if os.environ.get('DB_SSL', '').lower() in ('true', '1', 'yes'):
     DB_CONFIG['ssl_disabled'] = False
 
 
-pool = pooling.MySQLConnectionPool(
-    pool_name='hotel_pool',
-    pool_size=5,
-    **DB_CONFIG,
-)
+_pool = None
+
+def get_pool():
+    global _pool
+    if _pool is None:
+        _pool = pooling.MySQLConnectionPool(
+            pool_name='hotel_pool',
+            pool_size=5,
+            **DB_CONFIG,
+        )
+    return _pool
 
 
 def get_conn():
-    return pool.get_connection()
+    return get_pool().get_connection()
+
 
 
 # Stok kamar awal per tipe (kapasitas total tiap tipe kamar)
@@ -179,7 +186,11 @@ def init_db():
             END
         """)
     except Exception as e:
-        print(f"Warning: gagal membuat trigger trg_bookings_after_delete: {e}")
+        try:
+            conn.rollback()
+        except Exception:
+            pass
+        print(f"Info: Trigger database dilewati (tidak didukung provider database cloud seperti TiDB): {e}")
 
     conn.commit()
 
@@ -221,9 +232,13 @@ def sync_room_inventory(conn=None):
             conn.close()
 
 
-# Inisialisasi tabel saat startup
+# Inisialisasi tabel saat startup (tahan error agar app tidak crash)
 with app.app_context():
-    init_db()
+    try:
+        init_db()
+    except Exception as e:
+        print(f"[DB INIT ERROR] Inisialisasi database ditunda / terjadi error: {e}")
+
 
 # ── Lookup data ─────────────────────────────────────────────────────────────
 COUNTRY_CHOICES = [
